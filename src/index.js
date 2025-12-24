@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
-import App from "./App.js"; // Der Pfad muss genau stimmen
+import App from "./App"; // Der Pfad muss genau stimmen
 
 ReactDOM.render(
   <React.StrictMode>
