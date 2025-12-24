@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import "./index.css";
-import App from "./App"; // Der Pfad muss genau stimmen
+import "./styles/index.css";
+import App from "./App"; // Importiere die Hauptkomponente
 
 ReactDOM.render(
   <React.StrictMode>
