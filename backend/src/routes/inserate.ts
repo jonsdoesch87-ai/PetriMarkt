@@ -2,6 +2,7 @@ import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { authenticate } from '../middleware/auth.js';
 import { z } from 'zod';
+import logger from '../utils/logger.js';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -63,7 +64,7 @@ router.get('/', async (req, res) => {
 
     res.json(inserate);
   } catch (error) {
-    console.error('Fehler beim Laden der Inserate:', error);
+    logger.error('Fehler beim Laden der Inserate:', { error: (error as Error).message });
     res.status(500).json({ message: 'Fehler beim Laden der Inserate' });
   }
 });
@@ -96,7 +97,7 @@ router.get('/:id', async (req, res) => {
 
     res.json(inserat);
   } catch (error) {
-    console.error('Fehler beim Laden des Inserats:', error);
+    logger.error('Fehler beim Laden des Inserats:', { error: (error as Error).message });
     res.status(500).json({ message: 'Fehler beim Laden des Inserats' });
   }
 });
@@ -132,7 +133,7 @@ router.post('/', authenticate, async (req, res) => {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ message: 'Ungültige Eingabedaten', errors: error.errors });
     }
-    console.error('Fehler beim Erstellen des Inserats:', error);
+    logger.error('Fehler beim Erstellen des Inserats:', { error: error.message, stack: error.stack });
     res.status(500).json({ message: 'Fehler beim Erstellen des Inserats' });
   }
 });
@@ -180,7 +181,7 @@ router.put('/:id', authenticate, async (req, res) => {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ message: 'Ungültige Eingabedaten', errors: error.errors });
     }
-    console.error('Fehler beim Aktualisieren des Inserats:', error);
+    logger.error('Fehler beim Aktualisieren des Inserats:', { error: error.message, stack: error.stack });
     res.status(500).json({ message: 'Fehler beim Aktualisieren des Inserats' });
   }
 });
@@ -210,7 +211,7 @@ router.delete('/:id', authenticate, async (req, res) => {
 
     res.json({ message: 'Inserat gelöscht' });
   } catch (error) {
-    console.error('Fehler beim Löschen des Inserats:', error);
+    logger.error('Fehler beim Löschen des Inserats:', { error: (error as Error).message });
     res.status(500).json({ message: 'Fehler beim Löschen des Inserats' });
   }
 });
@@ -242,7 +243,7 @@ router.get('/my', authenticate, async (req, res) => {
 
     res.json(inserate);
   } catch (error) {
-    console.error('Fehler beim Laden der eigenen Inserate:', error);
+    logger.error('Fehler beim Laden der eigenen Inserate:', { error: (error as Error).message });
     res.status(500).json({ message: 'Fehler beim Laden der Inserate' });
   }
 });
