@@ -17,6 +17,11 @@ interface AuthState {
 export const useAuthStore = create<AuthState>((set) => {
   let initTimeout: NodeJS.Timeout | null = null;
   
+  // Helper function to check if user is authenticated (not anonymous)
+  const isUserAuthenticated = (userData: User | null): boolean => {
+    return !!userData && !!userData.email;
+  };
+  
   // Set up auth state listener with timeout protection
   initTimeout = setTimeout(() => {
     // If auth initialization takes too long, stop loading state
@@ -34,11 +39,9 @@ export const useAuthStore = create<AuthState>((set) => {
     if (firebaseUser) {
       try {
         const userData = await getUserData(firebaseUser.uid);
-        // Only consider users with email as authenticated (not anonymous users)
-        const isRealUser = !!userData && !!userData.email;
         set({ 
           user: userData, 
-          isAuthenticated: isRealUser,
+          isAuthenticated: isUserAuthenticated(userData),
           isLoading: false 
         });
       } catch (error) {
@@ -104,11 +107,9 @@ export const useAuthStore = create<AuthState>((set) => {
         const firebaseUser = await getCurrentUser();
         if (firebaseUser) {
           const userData = await getUserData(firebaseUser.uid);
-          // Only consider users with email as authenticated (not anonymous users)
-          const isRealUser = !!userData && !!userData.email;
           set({ 
             user: userData, 
-            isAuthenticated: isRealUser,
+            isAuthenticated: isUserAuthenticated(userData),
             isLoading: false 
           });
         } else {
