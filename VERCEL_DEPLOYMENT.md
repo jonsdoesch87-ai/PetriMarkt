@@ -2,6 +2,20 @@
 
 This guide explains how to deploy the PetriMarkt application to Vercel.
 
+## TL;DR - Quick Deploy
+
+**For Frontend Only (without real-time chat):**
+1. Push code to GitHub
+2. Go to [vercel.com](https://vercel.com) → Import repository
+3. Click Deploy (all settings are pre-configured in `vercel.json`)
+4. Done! Your app will be live at `https://your-app.vercel.app`
+
+**For Full App (with real-time chat):**
+1. Deploy frontend to Vercel (steps above)
+2. Deploy backend to [Railway](https://railway.app) or [Render](https://render.com)
+3. Add `VITE_BACKEND_URL` environment variable in Vercel pointing to your backend
+4. Redeploy frontend
+
 ## Architecture Overview
 
 PetriMarkt is a full-stack application with:
@@ -168,6 +182,9 @@ PetriMarkt/
 4. Test real-time chat (if backend is deployed)
 
 ## Troubleshooting
+
+### Issue: TypeScript build errors
+**Solution**: The repository has some pre-existing TypeScript errors. The `build:vercel` script bypasses type checking for deployment. To fix type errors permanently, run `npm run build` locally and address the TypeScript errors shown.
 
 ### Issue: Chat not working
 **Solution**: Make sure your backend is deployed separately and `VITE_BACKEND_URL` is set correctly in Vercel.

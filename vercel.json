@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "cd frontend && npm install && npm run build:vercel",
+  "buildCommand": "cd frontend && npm run build:vercel",
   "outputDirectory": "frontend/dist",
   "framework": "vite",
   "rewrites": [
