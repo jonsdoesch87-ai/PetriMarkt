@@ -7,12 +7,14 @@ export const requestLogger = (req: Request, res: Response, next: NextFunction) =
   // Log when response finishes
   res.on('finish', () => {
     const duration = Date.now() - start;
+    // Get real IP considering proxies (x-forwarded-for header)
+    const ip = req.headers['x-forwarded-for'] || req.ip;
     const logData = {
       method: req.method,
       url: req.url,
       status: res.statusCode,
       duration: `${duration}ms`,
-      ip: req.ip,
+      ip,
       userAgent: req.get('user-agent'),
     };
 

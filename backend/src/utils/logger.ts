@@ -30,10 +30,14 @@ const consoleFormat = winston.format.combine(
 // Create logs directory path
 const logsDir = path.join(__dirname, '../../logs');
 
-// Ensure logs directory exists
+// Ensure logs directory exists (synchronous is acceptable during module initialization)
 if (!fs.existsSync(logsDir)) {
   fs.mkdirSync(logsDir, { recursive: true });
 }
+
+// Log file configuration
+const LOG_FILE_MAX_SIZE = 5 * 1024 * 1024; // 5MB
+const LOG_FILE_MAX_FILES = 5;
 
 // Create the logger
 const logger = winston.createLogger({
@@ -45,14 +49,14 @@ const logger = winston.createLogger({
     new winston.transports.File({
       filename: path.join(logsDir, 'error.log'),
       level: 'error',
-      maxsize: 5242880, // 5MB
-      maxFiles: 5,
+      maxsize: LOG_FILE_MAX_SIZE,
+      maxFiles: LOG_FILE_MAX_FILES,
     }),
     // Combined log file
     new winston.transports.File({
       filename: path.join(logsDir, 'combined.log'),
-      maxsize: 5242880, // 5MB
-      maxFiles: 5,
+      maxsize: LOG_FILE_MAX_SIZE,
+      maxFiles: LOG_FILE_MAX_FILES,
     }),
   ],
 });
