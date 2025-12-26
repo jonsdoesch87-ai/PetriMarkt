@@ -18,7 +18,7 @@ export const useAuthStore = create<AuthState>((set) => {
   // Set up auth state listener with timeout protection
   const initTimeout = setTimeout(() => {
     // If auth initialization takes too long, stop loading state
-    console.warn('Firebase auth initialization timeout - setting loading to false');
+    console.warn('Firebase-Authentifizierung Timeout - Lade-Status wird auf false gesetzt');
     set({ isLoading: false });
   }, 5000);
 
