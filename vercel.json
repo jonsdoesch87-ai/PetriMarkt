@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
   "framework": "nextjs",
   "headers": [
     {
@@ -52,7 +51,7 @@
     }
   ],
   "functions": {
-    "app/**/*.{ts,tsx}": {
+    "app/api/**/*.{ts,tsx}": {
       "maxDuration": 10
     }
   }
