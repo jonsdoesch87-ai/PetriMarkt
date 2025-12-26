@@ -15,15 +15,24 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>((set) => {
-  // Auth State Listener einrichten
+  // Set up auth state listener
   onAuthStateChanged(auth, async (firebaseUser) => {
     if (firebaseUser) {
-      const userData = await getUserData(firebaseUser.uid);
-      set({ 
-        user: userData, 
-        isAuthenticated: !!userData,
-        isLoading: false 
-      });
+      try {
+        const userData = await getUserData(firebaseUser.uid);
+        set({ 
+          user: userData, 
+          isAuthenticated: !!userData,
+          isLoading: false 
+        });
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        set({ 
+          user: null, 
+          isAuthenticated: false,
+          isLoading: false 
+        });
+      }
     } else {
       set({ 
         user: null, 
@@ -41,7 +50,7 @@ export const useAuthStore = create<AuthState>((set) => {
       try {
         set({ isLoading: true });
         await login(email, password);
-        // onAuthStateChanged wird automatisch ausgelöst
+        // onAuthStateChanged will be triggered automatically
       } catch (error: any) {
         set({ isLoading: false });
         throw new Error(error.message || 'Login fehlgeschlagen');
@@ -51,7 +60,7 @@ export const useAuthStore = create<AuthState>((set) => {
       try {
         set({ isLoading: true });
         await register(email, password, name);
-        // onAuthStateChanged wird automatisch ausgelöst
+        // onAuthStateChanged will be triggered automatically
       } catch (error: any) {
         set({ isLoading: false });
         throw new Error(error.message || 'Registrierung fehlgeschlagen');
@@ -67,15 +76,24 @@ export const useAuthStore = create<AuthState>((set) => {
     },
     checkAuth: async () => {
       set({ isLoading: true });
-      const firebaseUser = await getCurrentUser();
-      if (firebaseUser) {
-        const userData = await getUserData(firebaseUser.uid);
-        set({ 
-          user: userData, 
-          isAuthenticated: !!userData,
-          isLoading: false 
-        });
-      } else {
+      try {
+        const firebaseUser = await getCurrentUser();
+        if (firebaseUser) {
+          const userData = await getUserData(firebaseUser.uid);
+          set({ 
+            user: userData, 
+            isAuthenticated: !!userData,
+            isLoading: false 
+          });
+        } else {
+          set({ 
+            user: null, 
+            isAuthenticated: false,
+            isLoading: false 
+          });
+        }
+      } catch (error) {
+        console.error('Error checking auth:', error);
         set({ 
           user: null, 
           isAuthenticated: false,
@@ -85,5 +103,4 @@ export const useAuthStore = create<AuthState>((set) => {
     },
   };
 });
-
 
