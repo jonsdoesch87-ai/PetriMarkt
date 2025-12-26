@@ -52,10 +52,7 @@
     }
   ],
   "functions": {
-    "app/**/*.tsx": {
-      "maxDuration": 10
-    },
-    "app/**/*.ts": {
+    "app/**/*.{ts,tsx}": {
       "maxDuration": 10
     }
   }
