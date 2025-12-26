@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { useAuthStore } from './store/authStore';
+import { seedTestData } from './utils/seedData';
 import Header from './components/Header';
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -12,6 +14,11 @@ import ChatList from './pages/ChatList';
 
 function App() {
   const { isAuthenticated, isLoading } = useAuthStore();
+
+  // Seed test data once when app loads
+  useEffect(() => {
+    seedTestData().catch(console.error);
+  }, []);
 
   if (isLoading) {
     return (

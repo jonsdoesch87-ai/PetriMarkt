@@ -55,7 +55,7 @@ export const loginAnonymously = async (): Promise<FirebaseUser> => {
   
   if (!userDoc.exists()) {
     await setDoc(userDocRef, {
-      email: 'anonymous',
+      email: null,
       name: 'Gast',
       phone: null,
       location: null,
