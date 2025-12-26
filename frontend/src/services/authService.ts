@@ -46,25 +46,38 @@ export const logout = async (): Promise<void> => {
 };
 
 export const loginAnonymously = async (): Promise<FirebaseUser> => {
-  const userCredential = await signInAnonymously(auth);
-  const firebaseUser = userCredential.user;
-  
-  // Create user document in Firestore for anonymous user if it doesn't exist
-  const userDocRef = doc(db, 'users', firebaseUser.uid);
-  const userDoc = await getDoc(userDocRef);
-  
-  if (!userDoc.exists()) {
-    await setDoc(userDocRef, {
-      email: null,
-      name: 'Gast',
-      phone: null,
-      location: null,
-      profileImage: null,
-      createdAt: serverTimestamp(),
-    });
+  try {
+    const userCredential = await signInAnonymously(auth);
+    const firebaseUser = userCredential.user;
+    
+    // Create user document in Firestore for anonymous user if it doesn't exist
+    const userDocRef = doc(db, 'users', firebaseUser.uid);
+    const userDoc = await getDoc(userDocRef);
+    
+    if (!userDoc.exists()) {
+      await setDoc(userDocRef, {
+        email: null,
+        name: 'Gast',
+        phone: null,
+        location: null,
+        profileImage: null,
+        createdAt: serverTimestamp(),
+      });
+    }
+    
+    return firebaseUser;
+  } catch (error: any) {
+    console.error('Anonymous login error:', error);
+    
+    // Provide more specific error messages
+    if (error.code === 'auth/network-request-failed') {
+      throw new Error('Netzwerkfehler. Bitte überprüfen Sie Ihre Internetverbindung.');
+    } else if (error.code === 'unavailable') {
+      throw new Error('Firebase-Dienst ist nicht erreichbar.');
+    }
+    
+    throw error;
   }
-  
-  return firebaseUser;
 };
 
 export const getCurrentUser = (): Promise<FirebaseUser | null> => {
