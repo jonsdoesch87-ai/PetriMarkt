@@ -102,12 +102,13 @@ export const getInserate = async (filters?: {
   } catch (error: any) {
     console.error('Error fetching inserate:', error);
     
-    // Provide more specific error messages
+    // Provide more specific error messages based on Firebase error codes
     if (error.code === 'unavailable') {
       throw new Error('Firebase-Dienst ist nicht erreichbar. Bitte versuchen Sie es später erneut.');
     } else if (error.code === 'permission-denied') {
       throw new Error('Zugriff verweigert. Bitte melden Sie sich an.');
-    } else if (error.message) {
+    } else if (error.message && error.message.includes('Keine Verbindung')) {
+      // Pass through our custom German error messages
       throw error;
     } else {
       throw new Error('Fehler beim Laden der Inserate. Bitte versuchen Sie es erneut.');

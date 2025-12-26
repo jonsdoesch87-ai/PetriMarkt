@@ -23,11 +23,9 @@ export const db = getFirestore(app);
 export const storage = getStorage(app);
 
 // Enable network for Firestore to ensure proper connection
-let networkEnabled = false;
 if (typeof window !== 'undefined') {
   enableNetwork(db)
     .then(() => {
-      networkEnabled = true;
       console.log('Firestore network enabled');
     })
     .catch((error) => {
