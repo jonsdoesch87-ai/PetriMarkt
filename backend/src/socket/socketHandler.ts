@@ -1,6 +1,7 @@
 import { Server, Socket } from 'socket.io';
 import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
+import logger from '../utils/logger.js';
 
 const prisma = new PrismaClient();
 
@@ -33,12 +34,12 @@ export const setupSocketIO = (io: Server) => {
 
   io.on('connection', (socket: AuthenticatedSocket) => {
     const userId = socket.userId!;
-    console.log(`User ${userId} verbunden`);
+    logger.info(`User ${userId} verbunden`);
 
     // User zu einem Raum hinzufügen (für Chat pro Inserat)
     socket.on('join-chat', async (inseratId: string) => {
       socket.join(`inserat-${inseratId}`);
-      console.log(`User ${userId} ist Chat für Inserat ${inseratId} beigetreten`);
+      logger.info(`User ${userId} ist Chat für Inserat ${inseratId} beigetreten`);
     });
 
     // Nachricht senden
@@ -94,7 +95,7 @@ export const setupSocketIO = (io: Server) => {
           senderName: message.sender.name || message.sender.email,
         });
       } catch (error) {
-        console.error('Fehler beim Senden der Nachricht:', error);
+        logger.error('Fehler beim Senden der Nachricht:', { error: (error as Error).message, userId });
         socket.emit('message-error', { message: 'Fehler beim Senden der Nachricht' });
       }
     });
@@ -104,7 +105,7 @@ export const setupSocketIO = (io: Server) => {
 
     // Verbindung trennen
     socket.on('disconnect', () => {
-      console.log(`User ${userId} getrennt`);
+      logger.info(`User ${userId} getrennt`);
     });
   });
 };

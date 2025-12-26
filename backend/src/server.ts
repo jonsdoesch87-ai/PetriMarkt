@@ -8,6 +8,8 @@ import userRoutes from './routes/users.js';
 import inseratRoutes from './routes/inserate.js';
 import chatRoutes from './routes/chat.js';
 import { setupSocketIO } from './socket/socketHandler.js';
+import logger from './utils/logger.js';
+import { requestLogger } from './middleware/requestLogger.js';
 
 dotenv.config();
 
@@ -29,6 +31,7 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
+app.use(requestLogger);
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -45,6 +48,6 @@ app.get('/api/health', (req, res) => {
 });
 
 httpServer.listen(PORT, () => {
-  console.log(`🚀 Server läuft auf Port ${PORT}`);
+  logger.info(`🚀 Server läuft auf Port ${PORT}`);
 });
 

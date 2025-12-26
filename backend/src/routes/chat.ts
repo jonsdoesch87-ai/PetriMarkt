@@ -2,6 +2,7 @@ import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { authenticate } from '../middleware/auth.js';
 import { z } from 'zod';
+import logger from '../utils/logger.js';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -113,7 +114,7 @@ router.get('/inserat/:inseratId', authenticate, async (req, res) => {
       otherUserId, // Für Verkäufer: ID des Käufers
     });
   } catch (error) {
-    console.error('Fehler beim Laden der Nachrichten:', error);
+    logger.error('Fehler beim Laden der Nachrichten:', { error: (error as Error).message });
     res.status(500).json({ message: 'Fehler beim Laden der Nachrichten' });
   }
 });
@@ -192,7 +193,7 @@ router.get('/conversations', authenticate, async (req, res) => {
 
     res.json(conversationsArray);
   } catch (error) {
-    console.error('Fehler beim Laden der Konversationen:', error);
+    logger.error('Fehler beim Laden der Konversationen:', { error: (error as Error).message });
     res.status(500).json({ message: 'Fehler beim Laden der Konversationen' });
   }
 });
@@ -239,7 +240,7 @@ router.post('/message', authenticate, async (req, res) => {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ message: 'Ungültige Eingabedaten', errors: error.errors });
     }
-    console.error('Fehler beim Senden der Nachricht:', error);
+    logger.error('Fehler beim Senden der Nachricht:', { error: error.message, stack: error.stack });
     res.status(500).json({ message: 'Fehler beim Senden der Nachricht' });
   }
 });

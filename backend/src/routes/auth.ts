@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
+import logger from '../utils/logger.js';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -70,7 +71,7 @@ router.post('/register', async (req, res) => {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ message: 'Ungültige Eingabedaten', errors: error.errors });
     }
-    console.error('Registrierungsfehler:', error);
+    logger.error('Registrierungsfehler:', { error: error.message, stack: error.stack });
     res.status(500).json({ message: 'Serverfehler bei der Registrierung' });
   }
 });
@@ -116,7 +117,7 @@ router.post('/login', async (req, res) => {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ message: 'Ungültige Eingabedaten', errors: error.errors });
     }
-    console.error('Login-Fehler:', error);
+    logger.error('Login-Fehler:', { error: error.message, stack: error.stack });
     res.status(500).json({ message: 'Serverfehler beim Login' });
   }
 });
@@ -156,7 +157,7 @@ router.get('/me', async (req, res) => {
 
     res.json(user);
   } catch (error) {
-    console.error('Auth-Check-Fehler:', error);
+    logger.error('Auth-Check-Fehler:', { error: (error as Error).message });
     res.status(401).json({ message: 'Ungültiger Token' });
   }
 });
