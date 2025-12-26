@@ -5,7 +5,8 @@ import { getStorage } from 'firebase/storage';
 import { getAnalytics } from 'firebase/analytics';
 
 // Prefer environment variables (for local/dev) but fall back to the deployed Firebase app
-// configuration so the Vercel build can run without any leftover PostgreSQL settings.
+// configuration so the static build continues to work even if env vars are missing.
+// Note: Firebase client config values are public; access is controlled via Firebase security rules.
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyCf3ieFxjZxQC7T-s4v6aix3u_HiUB9XkI',
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'petrimarkt.firebaseapp.com',
