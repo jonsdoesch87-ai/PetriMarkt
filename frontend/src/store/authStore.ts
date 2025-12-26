@@ -34,9 +34,11 @@ export const useAuthStore = create<AuthState>((set) => {
     if (firebaseUser) {
       try {
         const userData = await getUserData(firebaseUser.uid);
+        // Only consider users with email as authenticated (not anonymous users)
+        const isRealUser = !!userData && !!userData.email;
         set({ 
           user: userData, 
-          isAuthenticated: !!userData,
+          isAuthenticated: isRealUser,
           isLoading: false 
         });
       } catch (error) {
@@ -102,9 +104,11 @@ export const useAuthStore = create<AuthState>((set) => {
         const firebaseUser = await getCurrentUser();
         if (firebaseUser) {
           const userData = await getUserData(firebaseUser.uid);
+          // Only consider users with email as authenticated (not anonymous users)
+          const isRealUser = !!userData && !!userData.email;
           set({ 
             user: userData, 
-            isAuthenticated: !!userData,
+            isAuthenticated: isRealUser,
             isLoading: false 
           });
         } else {
