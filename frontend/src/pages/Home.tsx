@@ -7,6 +7,7 @@ import InseratCard from '../components/InseratCard';
 const Home = () => {
   const [inserate, setInserate] = useState<Inserat[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [category, setCategory] = useState('');
 
@@ -17,6 +18,7 @@ const Home = () => {
   const fetchInserate = async () => {
     try {
       setLoading(true);
+      setError(null);
       const data = await getInserate({
         category: category || undefined,
         search: searchTerm || undefined,
@@ -24,6 +26,7 @@ const Home = () => {
       setInserate(data);
     } catch (error) {
       console.error('Fehler beim Laden der Inserate:', error);
+      setError('Verbindung zur Datenbank fehlgeschlagen. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.');
     } finally {
       setLoading(false);
     }
@@ -82,6 +85,24 @@ const Home = () => {
       {loading ? (
         <div className="text-center py-12">
           <p className="text-gray-500">Lade Inserate...</p>
+        </div>
+      ) : error ? (
+        <div className="text-center py-12">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-2xl mx-auto">
+            <div className="flex items-center justify-center mb-4">
+              <svg className="h-12 w-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-red-800 mb-2">Verbindungsfehler</h3>
+            <p className="text-red-700 mb-4">{error}</p>
+            <button
+              onClick={fetchInserate}
+              className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors"
+            >
+              Erneut versuchen
+            </button>
+          </div>
         </div>
       ) : filteredInserate.length === 0 ? (
         <div className="text-center py-12">

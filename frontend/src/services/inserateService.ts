@@ -36,6 +36,12 @@ export const getInserate = async (filters?: {
   }
   
   const snapshot = await getDocs(q);
+  
+  // Check if data is from cache (indicating offline mode)
+  if (snapshot.metadata.fromCache && snapshot.empty) {
+    throw new Error('Offline: Unable to connect to database');
+  }
+  
   const inseratePromises = snapshot.docs.map(async (docSnap) => {
     const data = docSnap.data();
     
