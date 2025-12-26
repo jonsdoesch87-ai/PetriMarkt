@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { User } from '../types';
-import { register, login, logout, getCurrentUser, getUserData } from '../services/authService';
+import { register, login, logout, getCurrentUser, getUserData, loginAnonymously } from '../services/authService';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../firebase/config';
 
@@ -34,11 +34,18 @@ export const useAuthStore = create<AuthState>((set) => {
         });
       }
     } else {
-      set({ 
-        user: null, 
-        isAuthenticated: false,
-        isLoading: false 
-      });
+      // Automatically sign in anonymously if no user is logged in
+      try {
+        await loginAnonymously();
+        // onAuthStateChanged will be triggered again
+      } catch (error) {
+        console.error('Error signing in anonymously:', error);
+        set({ 
+          user: null, 
+          isAuthenticated: false,
+          isLoading: false 
+        });
+      }
     }
   });
 

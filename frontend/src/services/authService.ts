@@ -1,6 +1,7 @@
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signInAnonymously,
   signOut,
   onAuthStateChanged,
   User as FirebaseUser
@@ -42,6 +43,28 @@ export const login = async (email: string, password: string): Promise<FirebaseUs
 
 export const logout = async (): Promise<void> => {
   await signOut(auth);
+};
+
+export const loginAnonymously = async (): Promise<FirebaseUser> => {
+  const userCredential = await signInAnonymously(auth);
+  const firebaseUser = userCredential.user;
+  
+  // Create user document in Firestore for anonymous user if it doesn't exist
+  const userDocRef = doc(db, 'users', firebaseUser.uid);
+  const userDoc = await getDoc(userDocRef);
+  
+  if (!userDoc.exists()) {
+    await setDoc(userDocRef, {
+      email: null,
+      name: 'Gast',
+      phone: null,
+      location: null,
+      profileImage: null,
+      createdAt: serverTimestamp(),
+    });
+  }
+  
+  return firebaseUser;
 };
 
 export const getCurrentUser = (): Promise<FirebaseUser | null> => {

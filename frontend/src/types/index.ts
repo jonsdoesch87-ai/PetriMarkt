@@ -1,10 +1,10 @@
 export interface User {
   id: string;
-  email: string;
-  name?: string;
-  phone?: string;
-  location?: string;
-  profileImage?: string;
+  email: string | null;
+  name?: string | null;
+  phone?: string | null;
+  location?: string | null;
+  profileImage?: string | null;
   createdAt: string;
 }
 
