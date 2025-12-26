@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String
+  name          String?
+  phone         String?
+  location      String?
+  profileImage  String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  inserate      Inserat[]
+  sentMessages  Message[] @relation("Sender")
+  receivedMessages Message[] @relation("Receiver")
+}
+
+model Inserat {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  price       Float
+  category    String
+  condition   String   // Neu, Gebraucht, Selbst gebastelt
+  images      String[] // Array von Bild-URLs
+  location    String
+  zipCode     String?
+  status      String   @default("Aktiv") // Aktiv, Verkauft
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  messages    Message[]
+}
+
+model Message {
+  id          String   @id @default(cuid())
+  content     String
+  inseratId   String
+  inserat     Inserat  @relation(fields: [inseratId], references: [id], onDelete: Cascade)
+  senderId    String
+  sender      User     @relation("Sender", fields: [senderId], references: [id])
+  receiverId  String
+  receiver    User     @relation("Receiver", fields: [receiverId], references: [id])
+  createdAt   DateTime @default(now())
+  read        Boolean  @default(false)
+}
+
+
