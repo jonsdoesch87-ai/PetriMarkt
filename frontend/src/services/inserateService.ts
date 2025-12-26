@@ -8,7 +8,6 @@ import {
   updateDoc,
   deleteDoc,
   doc,
-  orderBy,
   Timestamp,
 } from 'firebase/firestore';
 import { db } from '../firebase/config';
@@ -19,18 +18,20 @@ export const getInserate = async (filters?: {
   search?: string;
   status?: string;
 }): Promise<Inserat[]> => {
-  let q = query(
-    collection(db, 'inserate'),
-    where('status', '==', filters?.status || 'Aktiv'),
-    orderBy('createdAt', 'desc')
-  );
+  let q;
   
   if (filters?.category) {
+    // When filtering by category, use both status and category
     q = query(
       collection(db, 'inserate'),
       where('status', '==', filters.status || 'Aktiv'),
-      where('category', '==', filters.category),
-      orderBy('createdAt', 'desc')
+      where('category', '==', filters.category)
+    );
+  } else {
+    // When not filtering by category, only filter by status
+    q = query(
+      collection(db, 'inserate'),
+      where('status', '==', filters.status || 'Aktiv')
     );
   }
   
@@ -77,6 +78,9 @@ export const getInserate = async (filters?: {
   });
   
   let inserate = await Promise.all(inseratePromises);
+  
+  // Client-side sorting by creation date (descending)
+  inserate.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   
   // Client-seitige Suche (Firestore hat limitierte Suchfunktionen)
   if (filters?.search) {
@@ -172,8 +176,7 @@ export const deleteInserat = async (id: string): Promise<void> => {
 export const getMyInserate = async (userId: string): Promise<Inserat[]> => {
   const q = query(
     collection(db, 'inserate'),
-    where('userId', '==', userId),
-    orderBy('createdAt', 'desc')
+    where('userId', '==', userId)
   );
   
   const snapshot = await getDocs(q);
@@ -218,6 +221,11 @@ export const getMyInserate = async (userId: string): Promise<Inserat[]> => {
     } as Inserat;
   });
   
-  return Promise.all(inseratePromises);
+  let inserate = await Promise.all(inseratePromises);
+  
+  // Client-side sorting by creation date (descending)
+  inserate.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  
+  return inserate;
 };
 

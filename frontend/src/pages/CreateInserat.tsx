@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { createInserat } from '../services/inserateService';
+import { createInserat, updateInserat } from '../services/inserateService';
 import { uploadInseratImages } from '../services/storageService';
 import { useAuthStore } from '../store/authStore';
 
@@ -46,9 +46,7 @@ const CreateInserat = () => {
       if (imageFiles.length > 0) {
         const imageUrls = await uploadInseratImages(imageFiles, inseratId);
         // Inserat mit Bild-URLs aktualisieren
-        await import('../services/inserateService').then(({ updateInserat }) =>
-          updateInserat(inseratId, { images: imageUrls })
-        );
+        await updateInserat(inseratId, { images: imageUrls });
       }
 
       navigate(`/inserat/${inseratId}`);
