@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore, enableNetwork } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import { getAnalytics } from 'firebase/analytics';
 
@@ -16,9 +16,23 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
+// Initialize services
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
+
+// Enable network for Firestore to ensure proper connection
+if (typeof window !== 'undefined') {
+  enableNetwork(db)
+    .then(() => {
+      console.log('Firestore network enabled');
+    })
+    .catch((error) => {
+      console.error('Error enabling Firestore network:', error);
+      // Network will be retried automatically by Firebase
+    });
+}
 
 // Analytics nur im Browser initialisieren
 export const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;

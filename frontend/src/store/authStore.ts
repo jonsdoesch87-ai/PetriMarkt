@@ -15,8 +15,22 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>((set) => {
-  // Set up auth state listener
+  let initTimeout: NodeJS.Timeout | null = null;
+  
+  // Set up auth state listener with timeout protection
+  initTimeout = setTimeout(() => {
+    // If auth initialization takes too long, stop loading state
+    console.warn('Firebase-Authentifizierung Timeout - Lade-Status wird auf false gesetzt');
+    set({ isLoading: false });
+    initTimeout = null;
+  }, 5000);
+
   onAuthStateChanged(auth, async (firebaseUser) => {
+    if (initTimeout) {
+      clearTimeout(initTimeout);
+      initTimeout = null;
+    }
+    
     if (firebaseUser) {
       try {
         const userData = await getUserData(firebaseUser.uid);
@@ -40,6 +54,7 @@ export const useAuthStore = create<AuthState>((set) => {
         // onAuthStateChanged will be triggered again
       } catch (error) {
         console.error('Error signing in anonymously:', error);
+        // Don't block the app if anonymous login fails
         set({ 
           user: null, 
           isAuthenticated: false,
