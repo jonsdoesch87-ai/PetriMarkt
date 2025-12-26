@@ -51,7 +51,7 @@
     }
   ],
   "functions": {
-    "app/api/**/*.{ts,tsx}": {
+    "app/api/**/*.ts": {
       "maxDuration": 10
     }
   }
