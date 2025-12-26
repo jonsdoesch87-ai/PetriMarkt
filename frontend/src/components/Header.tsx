@@ -13,7 +13,7 @@ const Header = () => {
           </Link>
           
           <nav className="flex items-center gap-4">
-            <Link to="/" className="text-gray-700 hover:text-primary-600">
+            <Link to="/browse" className="text-gray-700 hover:text-primary-600">
               Inserate
             </Link>
             
