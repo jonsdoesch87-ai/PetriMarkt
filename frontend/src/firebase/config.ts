@@ -4,14 +4,35 @@ import { getFirestore, enableNetwork } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import { getAnalytics } from 'firebase/analytics';
 
+// Validate required environment variables
+const requiredEnvVars = [
+  'VITE_FIREBASE_API_KEY',
+  'VITE_FIREBASE_AUTH_DOMAIN',
+  'VITE_FIREBASE_PROJECT_ID',
+  'VITE_FIREBASE_STORAGE_BUCKET',
+  'VITE_FIREBASE_MESSAGING_SENDER_ID',
+  'VITE_FIREBASE_APP_ID',
+] as const;
+
+const missingVars = requiredEnvVars.filter(varName => !import.meta.env[varName]);
+
+if (missingVars.length > 0) {
+  throw new Error(
+    `Missing required Firebase environment variables: ${missingVars.join(', ')}. ` +
+    'Please check your .env.local file and ensure all required variables are set. ' +
+    'See FIREBASE_CONFIG.md for setup instructions.'
+  );
+}
+
 const firebaseConfig = {
-  apiKey: "AIzaSyCf3ieFxjZxQC7T-s4v6aix3u_HiUB9XkI",
-  authDomain: "petrimarkt.firebaseapp.com",
-  projectId: "petrimarkt",
-  storageBucket: "petrimarkt.firebasestorage.app",
-  messagingSenderId: "906170983684",
-  appId: "1:906170983684:web:c73df454f608762cf61c51",
-  measurementId: "G-R1ETFBVMZC"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  // measurementId is optional - only needed for Google Analytics
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase
