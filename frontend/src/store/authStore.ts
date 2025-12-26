@@ -17,6 +17,11 @@ interface AuthState {
 export const useAuthStore = create<AuthState>((set) => {
   let initTimeout: NodeJS.Timeout | null = null;
   
+  // Helper function to check if user is authenticated (not anonymous)
+  const isUserAuthenticated = (userData: User | null): boolean => {
+    return !!userData && !!userData.email;
+  };
+  
   // Set up auth state listener with timeout protection
   initTimeout = setTimeout(() => {
     // If auth initialization takes too long, stop loading state
@@ -36,7 +41,7 @@ export const useAuthStore = create<AuthState>((set) => {
         const userData = await getUserData(firebaseUser.uid);
         set({ 
           user: userData, 
-          isAuthenticated: !!userData,
+          isAuthenticated: isUserAuthenticated(userData),
           isLoading: false 
         });
       } catch (error) {
@@ -104,7 +109,7 @@ export const useAuthStore = create<AuthState>((set) => {
           const userData = await getUserData(firebaseUser.uid);
           set({ 
             user: userData, 
-            isAuthenticated: !!userData,
+            isAuthenticated: isUserAuthenticated(userData),
             isLoading: false 
           });
         } else {
