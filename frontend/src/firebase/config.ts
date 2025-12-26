@@ -4,35 +4,17 @@ import { getFirestore, enableNetwork } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import { getAnalytics } from 'firebase/analytics';
 
-// Validate required environment variables
-const requiredEnvVars = [
-  'VITE_FIREBASE_API_KEY',
-  'VITE_FIREBASE_AUTH_DOMAIN',
-  'VITE_FIREBASE_PROJECT_ID',
-  'VITE_FIREBASE_STORAGE_BUCKET',
-  'VITE_FIREBASE_MESSAGING_SENDER_ID',
-  'VITE_FIREBASE_APP_ID',
-] as const;
-
-const missingVars = requiredEnvVars.filter(varName => !import.meta.env[varName]);
-
-if (missingVars.length > 0) {
-  throw new Error(
-    `Missing required Firebase environment variables: ${missingVars.join(', ')}. ` +
-    'Please check your .env.local file and ensure all required variables are set. ' +
-    'See FIREBASE_CONFIG.md for setup instructions.'
-  );
-}
-
+// Prefer environment variables (for local/dev) but fall back to the deployed Firebase app
+// configuration so the Vercel build can run without any leftover PostgreSQL settings.
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyCf3ieFxjZxQC7T-s4v6aix3u_HiUB9XkI',
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'petrimarkt.firebaseapp.com',
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'petrimarkt',
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'petrimarkt.firebasestorage.app',
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '906170983684',
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || '1:906170983684:web:c73df454f608762cf61c51',
   // measurementId is optional - only needed for Google Analytics
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || 'G-R1ETFBVMZC'
 };
 
 // Initialize Firebase
