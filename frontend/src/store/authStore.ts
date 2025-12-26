@@ -15,15 +15,21 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>((set) => {
+  let initTimeout: NodeJS.Timeout | null = null;
+  
   // Set up auth state listener with timeout protection
-  const initTimeout = setTimeout(() => {
+  initTimeout = setTimeout(() => {
     // If auth initialization takes too long, stop loading state
     console.warn('Firebase-Authentifizierung Timeout - Lade-Status wird auf false gesetzt');
     set({ isLoading: false });
+    initTimeout = null;
   }, 5000);
 
   onAuthStateChanged(auth, async (firebaseUser) => {
-    clearTimeout(initTimeout);
+    if (initTimeout) {
+      clearTimeout(initTimeout);
+      initTimeout = null;
+    }
     
     if (firebaseUser) {
       try {

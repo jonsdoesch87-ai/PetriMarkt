@@ -23,10 +23,17 @@ export const db = getFirestore(app);
 export const storage = getStorage(app);
 
 // Enable network for Firestore to ensure proper connection
+let networkEnabled = false;
 if (typeof window !== 'undefined') {
-  enableNetwork(db).catch((error) => {
-    console.error('Error enabling Firestore network:', error);
-  });
+  enableNetwork(db)
+    .then(() => {
+      networkEnabled = true;
+      console.log('Firestore network enabled');
+    })
+    .catch((error) => {
+      console.error('Error enabling Firestore network:', error);
+      // Network will be retried automatically by Firebase
+    });
 }
 
 // Analytics nur im Browser initialisieren

@@ -122,7 +122,7 @@ export const getInserat = async (id: string): Promise<Inserat> => {
     
     // Check if data is from cache (indicating offline mode)
     if (docSnap.metadata.fromCache && !docSnap.exists()) {
-      throw new Error('Offline: Verbindung zur Datenbank nicht möglich');
+      throw new Error('Verbindung zur Datenbank nicht möglich. Bitte überprüfen Sie Ihre Internetverbindung.');
     }
     
     if (!docSnap.exists()) {
