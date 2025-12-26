@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { Inserat } from '../types';
 import { getInserate } from '../services/inserateService';
 import InseratCard from '../components/InseratCard';

@@ -11,7 +11,7 @@ import {
   Timestamp,
 } from 'firebase/firestore';
 import { db } from '../firebase/config';
-import { Inserat, User } from '../types';
+import { Inserat } from '../types';
 
 export const getInserate = async (filters?: {
   category?: string;
@@ -24,14 +24,14 @@ export const getInserate = async (filters?: {
     // When filtering by category, use both status and category
     q = query(
       collection(db, 'inserate'),
-      where('status', '==', filters.status || 'Aktiv'),
+      where('status', '==', filters?.status || 'Aktiv'),
       where('category', '==', filters.category)
     );
   } else {
     // When not filtering by category, only filter by status
     q = query(
       collection(db, 'inserate'),
-      where('status', '==', filters.status || 'Aktiv')
+      where('status', '==', filters?.status || 'Aktiv')
     );
   }
   
@@ -103,6 +103,11 @@ export const getInserate = async (filters?: {
 export const getInserat = async (id: string): Promise<Inserat> => {
   const docRef = doc(db, 'inserate', id);
   const docSnap = await getDoc(docRef);
+  
+  // Check if data is from cache (indicating offline mode)
+  if (docSnap.metadata.fromCache && !docSnap.exists()) {
+    throw new Error('Offline: Unable to connect to database');
+  }
   
   if (!docSnap.exists()) {
     throw new Error('Inserat nicht gefunden');
@@ -186,6 +191,12 @@ export const getMyInserate = async (userId: string): Promise<Inserat[]> => {
   );
   
   const snapshot = await getDocs(q);
+  
+  // Check if data is from cache (indicating offline mode)
+  if (snapshot.metadata.fromCache && snapshot.empty) {
+    throw new Error('Offline: Unable to connect to database');
+  }
+  
   const inseratePromises = snapshot.docs.map(async (docSnap) => {
     const data = docSnap.data();
     
