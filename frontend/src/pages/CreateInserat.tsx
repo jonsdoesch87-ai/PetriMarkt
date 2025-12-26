@@ -225,7 +225,7 @@ const CreateInserat = () => {
             </button>
             <button
               type="button"
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/browse')}
               className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
             >
               Abbrechen

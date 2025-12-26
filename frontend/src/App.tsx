@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { useAuthStore } from './store/authStore';
 import { seedTestData } from './utils/seedData';
 import Header from './components/Header';
+import Landing from './pages/Landing';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -37,14 +38,15 @@ function App() {
         <Header />
         <main className="container mx-auto px-4 py-8">
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Landing />} />
+            <Route path="/browse" element={<Home />} />
             <Route 
               path="/login" 
-              element={isAuthenticated ? <Navigate to="/" /> : <Login />} 
+              element={isAuthenticated ? <Navigate to="/browse" /> : <Login />} 
             />
             <Route 
               path="/register" 
-              element={isAuthenticated ? <Navigate to="/" /> : <Register />} 
+              element={isAuthenticated ? <Navigate to="/browse" /> : <Register />} 
             />
             <Route path="/inserat/:id" element={<InseratDetail />} />
             <Route 
