@@ -38,7 +38,7 @@ function App() {
         <Header />
         <main className="container mx-auto px-4 py-8">
           <Routes>
-            <Route path="/" element={<Landing />} />
+            <Route path="/" element={isAuthenticated ? <Navigate to="/browse" /> : <Landing />} />
             <Route path="/browse" element={<Home />} />
             <Route 
               path="/login" 
