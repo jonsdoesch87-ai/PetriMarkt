@@ -7,7 +7,13 @@ import { Chat } from '@/lib/types';
 
 /**
  * Hook to count unread chats for the current user
- * A chat is considered unread if it has messages but the user hasn't opened it recently
+ * 
+ * Current implementation: Counts all chats with messages as unread.
+ * 
+ * Future enhancement: Track when each user last viewed each chat
+ * by adding a `lastViewedAt` field per participant in the chat document,
+ * then compare with `lastMessageAt` to determine truly unread chats.
+ * Example structure: { participants: ['user1', 'user2'], lastViewedAt: { user1: Timestamp, user2: Timestamp } }
  */
 export function useUnreadChatsCount(userId: string | null | undefined) {
   const [unreadCount, setUnreadCount] = useState(0);
@@ -26,9 +32,8 @@ export function useUnreadChatsCount(userId: string | null | undefined) {
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      // Count chats with recent messages
-      // For simplicity, we'll count all chats with lastMessageAt as unread
-      // In a real app, you'd track when the user last viewed each chat
+      // Current simplified implementation: Count all chats with messages
+      // Future: Compare lastMessageAt with user's lastViewedAt per chat
       const count = snapshot.docs.filter(doc => {
         const data = doc.data() as Chat;
         return data.lastMessageAt != null;

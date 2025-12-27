@@ -9,6 +9,8 @@ import AuthDialog from './AuthDialog';
 import { useState } from 'react';
 import { useUnreadChatsCount } from '@/lib/hooks';
 
+const MAX_NOTIFICATION_DISPLAY = 9;
+
 export default function Header() {
   const { user, signOut } = useAuth();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
@@ -38,7 +40,7 @@ export default function Header() {
                   </Button>
                   {unreadCount > 0 && (
                     <Badge variant="notification" className="absolute -top-1 -right-1 px-1.5 min-w-[1.25rem] h-5">
-                      {unreadCount > 9 ? '9+' : unreadCount}
+                      {unreadCount > MAX_NOTIFICATION_DISPLAY ? `${MAX_NOTIFICATION_DISPLAY}+` : unreadCount}
                     </Badge>
                   )}
                 </Link>
