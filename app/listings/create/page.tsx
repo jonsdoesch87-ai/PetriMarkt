@@ -96,7 +96,8 @@ export default function CreateListingPage() {
         imageUrls = await uploadImages();
       } catch (uploadErr) {
         console.error('Error uploading images:', uploadErr);
-        throw new Error('Fehler beim Hochladen der Bilder. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.');
+        throw new Error('Fehler beim Hochladen der Bilder. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.', 
+          { cause: uploadErr });
       }
 
       // Create listing document only after successful upload
@@ -117,7 +118,8 @@ export default function CreateListingPage() {
         router.push(`/listings/${docRef.id}`);
       } catch (dbErr) {
         console.error('Error creating listing in database:', dbErr);
-        throw new Error('Fehler beim Speichern des Inserats in der Datenbank. Bitte versuchen Sie es erneut.');
+        throw new Error('Fehler beim Speichern des Inserats in der Datenbank. Bitte versuchen Sie es erneut.', 
+          { cause: dbErr });
       }
     } catch (err) {
       console.error('Error creating listing:', err);
