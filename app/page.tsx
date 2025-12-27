@@ -102,17 +102,6 @@ export default function HomePage() {
         {/* Search Bar */}
         <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
           <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Suche nach Artikeln..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-              />
-            </div>
             <Select value={selectedCategory} onValueChange={(value) => setSelectedCategory(value as Category | 'all')}>
               <SelectTrigger className="w-full md:w-[200px]">
                 <SelectValue placeholder="Kategorie" />
@@ -124,6 +113,17 @@ export default function HomePage() {
                 ))}
               </SelectContent>
             </Select>
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Suche nach Artikeln..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+              />
+            </div>
             <Select value={selectedCanton} onValueChange={(value) => setSelectedCanton(value as Canton | 'all')}>
               <SelectTrigger className="w-full md:w-[200px]">
                 <SelectValue placeholder="Kanton" />
@@ -141,25 +141,6 @@ export default function HomePage() {
               Suchen
             </Button>
           </div>
-        </div>
-      </div>
-
-      {/* Categories */}
-      <div className="mb-12">
-        <h2 className="text-2xl font-bold mb-6">Kategorien</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
-          {CATEGORIES.map((category) => (
-            <button
-              key={category}
-              onClick={() => {
-                setSelectedCategory(category);
-                handleSearch();
-              }}
-              className="p-4 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors font-medium"
-            >
-              {category}
-            </button>
-          ))}
         </div>
       </div>
 
