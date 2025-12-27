@@ -5,7 +5,7 @@ import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Listing } from '@/lib/types';
 import { CATEGORIES, CANTONS, CANTON_NAMES, Category, Canton } from '@/lib/constants';
-import { Search, Fish as FishIcon, Package, Shirt, Ship, MoreHorizontal, Anchor } from 'lucide-react';
+import { Search, Fish as FishIcon, Package, Shirt, Ship, MoreHorizontal, Anchor, LucideIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -24,7 +24,7 @@ export default function HomePage() {
   const [selectedCanton, setSelectedCanton] = useState<Canton | 'all'>('all');
   const [loading, setLoading] = useState(true);
 
-  const categoryIcons: Record<string, any> = {
+  const categoryIcons: Record<string, LucideIcon> = {
     'Ruten': Anchor,
     'Rollen': Package,
     'Köder': FishIcon,
@@ -174,7 +174,7 @@ export default function HomePage() {
           <div className="text-center py-12">
             <p className="text-muted-foreground">Lade Inserate...</p>
           </div>
-        ) : (
+        ) : listings.length === 0 ? (
           <div className="text-center py-12 bg-muted/50 rounded-2xl">
             <p className="text-muted-foreground">Keine Inserate gefunden.</p>
             <p className="text-sm text-muted-foreground mt-2">
