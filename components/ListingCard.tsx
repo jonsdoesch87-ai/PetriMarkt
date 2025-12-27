@@ -5,7 +5,9 @@ import Image from 'next/image';
 import { Listing } from '@/lib/types';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { formatPrice } from '@/lib/utils';
-import { MapPin, Tag } from 'lucide-react';
+import { MapPin, Tag, Heart } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useFavorites } from '@/lib/hooks/useFavorites';
 
 interface ListingCardProps {
   listing: Listing;
@@ -13,11 +15,36 @@ interface ListingCardProps {
 
 export default function ListingCard({ listing }: ListingCardProps) {
   const imageUrl = listing.imageUrls?.[0] || '/placeholder-fish.jpg';
+  const { user } = useAuth();
+  const { isFavorite, toggleFavorite } = useFavorites(user?.uid);
+
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (user) {
+      toggleFavorite(listing.id);
+    }
+  };
 
   return (
     <Link href={`/listings/${listing.id}`}>
-      <Card className="hover:shadow-md transition-shadow cursor-pointer h-full border border-gray-200 shadow-sm rounded-lg">
-        <div className="relative h-48 w-full overflow-hidden rounded-t-lg bg-muted">
+      <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full border border-gray-200 shadow-md rounded-2xl relative">
+        {user && (
+          <button
+            onClick={handleFavoriteClick}
+            className="absolute top-3 right-3 z-10 p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors"
+            aria-label={isFavorite(listing.id) ? "Von Favoriten entfernen" : "Zu Favoriten hinzufügen"}
+          >
+            <Heart
+              className={`h-5 w-5 ${
+                isFavorite(listing.id)
+                  ? 'fill-red-500 text-red-500'
+                  : 'text-gray-600'
+              }`}
+            />
+          </button>
+        )}
+        <div className="relative h-48 w-full overflow-hidden rounded-t-2xl bg-muted">
           {listing.imageUrls?.[0] ? (
             <Image
               src={imageUrl}
@@ -44,13 +71,13 @@ export default function ListingCard({ listing }: ListingCardProps) {
             <span>{listing.category}</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-xs px-2 py-1 bg-secondary rounded-md">
+            <span className="text-xs px-2 py-1 bg-secondary/10 text-secondary rounded-md">
               {listing.condition}
             </span>
           </div>
         </CardContent>
         <CardFooter>
-          <div className="text-2xl font-bold text-primary">
+          <div className="text-2xl font-bold text-price-accent">
             {formatPrice(listing.price)}
           </div>
         </CardFooter>

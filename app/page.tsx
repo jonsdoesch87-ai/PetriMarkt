@@ -5,7 +5,7 @@ import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Listing } from '@/lib/types';
 import { CATEGORIES, CANTONS, CANTON_NAMES, Category, Canton } from '@/lib/constants';
-import { Search } from 'lucide-react';
+import { Search, Fish as FishIcon, Package, Shirt, Ship, MoreHorizontal, Anchor, LucideIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -23,6 +23,16 @@ export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState<Category | 'all'>('all');
   const [selectedCanton, setSelectedCanton] = useState<Canton | 'all'>('all');
   const [loading, setLoading] = useState(true);
+
+  const categoryIcons: Record<string, LucideIcon> = {
+    'Ruten': Anchor,
+    'Rollen': Package,
+    'Köder': FishIcon,
+    'Zubehör': Package,
+    'Bekleidung': Shirt,
+    'Boote': Ship,
+    'Sonstiges': MoreHorizontal,
+  };
 
   useEffect(() => {
     fetchListings();
@@ -100,17 +110,30 @@ export default function HomePage() {
         </p>
 
         {/* Search Bar */}
-        <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
+        <div className="max-w-4xl mx-auto bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg">
           <div className="flex flex-col md:flex-row gap-4">
             <Select value={selectedCategory} onValueChange={(value) => setSelectedCategory(value as Category | 'all')}>
               <SelectTrigger className="w-full md:w-[200px]">
                 <SelectValue placeholder="Kategorie" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Alle Kategorien</SelectItem>
-                {CATEGORIES.map(cat => (
-                  <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                ))}
+                <SelectItem value="all">
+                  <div className="flex items-center gap-2">
+                    <Package className="h-4 w-4" />
+                    <span>Alle Kategorien</span>
+                  </div>
+                </SelectItem>
+                {CATEGORIES.map(cat => {
+                  const Icon = categoryIcons[cat] || Package;
+                  return (
+                    <SelectItem key={cat} value={cat}>
+                      <div className="flex items-center gap-2">
+                        <Icon className="h-4 w-4" />
+                        <span>{cat}</span>
+                      </div>
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
             <div className="flex-1 relative">
@@ -152,7 +175,7 @@ export default function HomePage() {
             <p className="text-muted-foreground">Lade Inserate...</p>
           </div>
         ) : listings.length === 0 ? (
-          <div className="text-center py-12 bg-muted rounded-lg">
+          <div className="text-center py-12 bg-muted/50 rounded-2xl">
             <p className="text-muted-foreground">Keine Inserate gefunden.</p>
             <p className="text-sm text-muted-foreground mt-2">
               Seien Sie der Erste und erstellen Sie ein Inserat!
