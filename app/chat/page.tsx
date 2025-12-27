@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
 import { Chat, Listing } from '@/lib/types';
@@ -21,73 +21,72 @@ export default function ChatListPage() {
   const [chats, setChats] = useState<ChatWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchChats = useCallback(async () => {
-    if (!user) return;
-
-    try {
-      const chatsRef = collection(db, 'chats');
-      const q = query(
-        chatsRef,
-        where('participants', 'array-contains', user.uid)
-      );
-      const snapshot = await getDocs(q);
-      
-      const chatsData = await Promise.all(
-        snapshot.docs.map(async (chatDoc) => {
-          const chatData = { id: chatDoc.id, ...chatDoc.data() } as Chat;
-          
-          // Fetch listing details
-          let listing: Listing | undefined;
-          if (chatData.listingId) {
-            const listingDoc = await getDoc(doc(db, 'listings', chatData.listingId));
-            if (listingDoc.exists()) {
-              listing = { id: listingDoc.id, ...listingDoc.data() } as Listing;
-            }
-          }
-          
-          // Get other user's email
-          const otherUserId = chatData.participants.find(id => id !== user.uid);
-          let otherUserEmail = 'Unbekannt';
-          if (otherUserId) {
-            const userDoc = await getDoc(doc(db, 'users', otherUserId));
-            if (userDoc.exists()) {
-              otherUserEmail = userDoc.data().email;
-            }
-          }
-          
-          return {
-            ...chatData,
-            listing,
-            otherUserEmail,
-          };
-        })
-      );
-      
-      // Sort by last message time
-      chatsData.sort((a, b) => {
-        const timeA = a.lastMessageAt?.toMillis() || 0;
-        const timeB = b.lastMessageAt?.toMillis() || 0;
-        return timeB - timeA;
-      });
-      
-      setChats(chatsData);
-    } catch (error) {
-      console.error('Error fetching chats:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [user]);
-
   useEffect(() => {
     if (!authLoading && !user) {
       router.push('/');
       return;
     }
     
-    if (user) {
-      fetchChats();
-    }
-  }, [user, authLoading, router, fetchChats]);
+    if (!user) return;
+
+    // Subscribe to chats in real-time
+    const chatsRef = collection(db, 'chats');
+    const q = query(
+      chatsRef,
+      where('participants', 'array-contains', user.uid)
+    );
+
+    const unsubscribe = onSnapshot(q, async (snapshot) => {
+      try {
+        const chatsData = await Promise.all(
+          snapshot.docs.map(async (chatDoc) => {
+            const chatData = { id: chatDoc.id, ...chatDoc.data() } as Chat;
+            
+            // Fetch listing details
+            let listing: Listing | undefined;
+            if (chatData.listingId) {
+              const listingDoc = await getDoc(doc(db, 'listings', chatData.listingId));
+              if (listingDoc.exists()) {
+                listing = { id: listingDoc.id, ...listingDoc.data() } as Listing;
+              }
+            }
+            
+            // Get other user's email
+            const otherUserId = chatData.participants.find(id => id !== user.uid);
+            let otherUserEmail = 'Unbekannt';
+            if (otherUserId) {
+              const userDoc = await getDoc(doc(db, 'users', otherUserId));
+              if (userDoc.exists()) {
+                otherUserEmail = userDoc.data().email;
+              }
+            }
+            
+            return {
+              ...chatData,
+              listing,
+              otherUserEmail,
+            };
+          })
+        );
+        
+        // Sort by last message time
+        chatsData.sort((a, b) => {
+          const timeA = a.lastMessageAt?.toMillis() || 0;
+          const timeB = b.lastMessageAt?.toMillis() || 0;
+          return timeB - timeA;
+        });
+        
+        setChats(chatsData);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching chats:', error);
+        setLoading(false);
+      }
+    });
+
+    // Cleanup function to unsubscribe when component unmounts
+    return () => unsubscribe();
+  }, [user, authLoading, router]);
 
   if (authLoading || !user) {
     return (
