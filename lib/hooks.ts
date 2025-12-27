@@ -38,12 +38,13 @@ export function useUnreadChatsCount(userId: string | null | undefined) {
         }
         
         // No lastRead record for this user - chat is unread
-        if (!data.lastRead || !data.lastRead[userId]) {
+        // userId is guaranteed to be non-null here due to the check at the top of useEffect
+        if (!data.lastRead || !data.lastRead[userId!]) {
           return true;
         }
         
         // Compare timestamps: unread if lastMessageAt > lastRead[userId]
-        return data.lastMessageAt.toMillis() > data.lastRead[userId].toMillis();
+        return data.lastMessageAt.toMillis() > data.lastRead[userId!].toMillis();
       }).length;
       
       setUnreadCount(count);

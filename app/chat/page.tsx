@@ -28,6 +28,7 @@ export default function ChatListPage() {
     }
     
     // No lastRead record for this user - chat is unread
+    // user.uid is guaranteed to exist here due to the check above
     if (!chat.lastRead || !chat.lastRead[user.uid]) {
       return true;
     }
