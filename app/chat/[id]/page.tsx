@@ -35,6 +35,19 @@ export default function ChatPage() {
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Helper function to mark chat as read
+  const markChatAsRead = useCallback(async () => {
+    if (!user) return;
+    
+    try {
+      await updateDoc(doc(db, 'chats', params.id as string), {
+        [`lastRead.${user.uid}`]: serverTimestamp(),
+      });
+    } catch (error) {
+      console.error('Error marking chat as read:', error);
+    }
+  }, [user, params.id]);
+
   const fetchChatAndListing = useCallback(async () => {
     if (!user) return;
     
@@ -55,6 +68,9 @@ export default function ChatPage() {
       
       setChat(chatData);
 
+      // Mark chat as read by updating lastRead timestamp for current user
+      await markChatAsRead();
+
       // Fetch listing
       if (chatData.listingId) {
         const listingDoc = await getDoc(doc(db, 'listings', chatData.listingId));
@@ -67,7 +83,7 @@ export default function ChatPage() {
     } finally {
       setLoading(false);
     }
-  }, [user, params.id, router]);
+  }, [user, params.id, router, markChatAsRead]);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -121,10 +137,11 @@ export default function ChatPage() {
 
       await addDoc(collection(db, 'messages'), messageData);
       
-      // Update chat with last message
+      // Update chat with last message and mark as read for sender in a single operation
       await updateDoc(doc(db, 'chats', params.id as string), {
         lastMessage: newMessage.trim(),
         lastMessageAt: serverTimestamp(),
+        [`lastRead.${user.uid}`]: serverTimestamp(),
       });
 
       setNewMessage('');

@@ -27,6 +27,7 @@ export interface Chat {
   listingId: string;
   lastMessageAt: Timestamp;
   lastMessage?: string;
+  lastRead?: { [userId: string]: Timestamp };
 }
 
 export interface Message {
