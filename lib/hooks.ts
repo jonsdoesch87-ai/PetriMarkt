@@ -21,11 +21,14 @@ export function useUnreadChatsCount(userId: string | null | undefined) {
       return;
     }
 
+    // Capture userId in a const for use in callback to avoid non-null assertions
+    const currentUserId = userId;
+
     // Subscribe to chats where the user is a participant
     const chatsRef = collection(db, 'chats');
     const q = query(
       chatsRef,
-      where('participants', 'array-contains', userId)
+      where('participants', 'array-contains', currentUserId)
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -38,13 +41,12 @@ export function useUnreadChatsCount(userId: string | null | undefined) {
         }
         
         // No lastRead record for this user - chat is unread
-        // userId is guaranteed to be non-null here due to the check at the top of useEffect
-        if (!data.lastRead || !data.lastRead[userId!]) {
+        if (!data.lastRead || !data.lastRead[currentUserId]) {
           return true;
         }
         
         // Compare timestamps: unread if lastMessageAt > lastRead[userId]
-        return data.lastMessageAt.toMillis() > data.lastRead[userId!].toMillis();
+        return data.lastMessageAt.toMillis() > data.lastRead[currentUserId].toMillis();
       }).length;
       
       setUnreadCount(count);
