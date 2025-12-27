@@ -21,6 +21,21 @@ export default function ChatListPage() {
   const [chats, setChats] = useState<ChatWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Helper function to check if a chat is unread
+  const isUnread = (chat: Chat) => {
+    if (!user || !chat.lastMessageAt) {
+      return false;
+    }
+    
+    // No lastRead record for this user - chat is unread
+    if (!chat.lastRead || !chat.lastRead[user.uid]) {
+      return true;
+    }
+    
+    // Compare timestamps: unread if lastMessageAt > lastRead[userId]
+    return chat.lastMessageAt.toMillis() > chat.lastRead[user.uid].toMillis();
+  };
+
   useEffect(() => {
     if (!authLoading && !user) {
       router.push('/');
@@ -115,34 +130,50 @@ export default function ChatListPage() {
             </div>
           ) : (
             <div className="space-y-2">
-              {chats.map((chat) => (
-                <button
-                  key={chat.id}
-                  onClick={() => router.push(`/chat/${chat.id}`)}
-                  className="w-full text-left p-4 rounded-lg border hover:bg-muted transition-colors"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="font-semibold mb-1">
-                        {chat.listing?.title || 'Unbekanntes Inserat'}
+              {chats.map((chat) => {
+                const chatIsUnread = isUnread(chat);
+                return (
+                  <button
+                    key={chat.id}
+                    onClick={() => router.push(`/chat/${chat.id}`)}
+                    className={`w-full text-left p-4 rounded-lg border transition-colors ${
+                      chatIsUnread 
+                        ? 'bg-blue-50 border-blue-200 hover:bg-blue-100' 
+                        : 'hover:bg-muted'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1 flex items-start gap-2">
+                        {chatIsUnread && (
+                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0" />
+                        )}
+                        <div className="flex-1">
+                          <div className={`mb-1 ${chatIsUnread ? 'font-bold' : 'font-semibold'}`}>
+                            {chat.listing?.title || 'Unbekanntes Inserat'}
+                          </div>
+                          <div className="text-sm text-muted-foreground mb-1">
+                            Mit: {chat.otherUserEmail}
+                          </div>
+                          {chat.lastMessage && (
+                            <div className={`text-sm text-muted-foreground line-clamp-1 ${
+                              chatIsUnread ? 'font-semibold' : ''
+                            }`}>
+                              {chat.lastMessage}
+                            </div>
+                          )}
+                        </div>
                       </div>
-                      <div className="text-sm text-muted-foreground mb-1">
-                        Mit: {chat.otherUserEmail}
-                      </div>
-                      {chat.lastMessage && (
-                        <div className="text-sm text-muted-foreground line-clamp-1">
-                          {chat.lastMessage}
+                      {chat.lastMessageAt && (
+                        <div className={`text-xs text-muted-foreground ml-4 ${
+                          chatIsUnread ? 'font-semibold' : ''
+                        }`}>
+                          {format(chat.lastMessageAt.toDate(), 'dd.MM.yy HH:mm')}
                         </div>
                       )}
                     </div>
-                    {chat.lastMessageAt && (
-                      <div className="text-xs text-muted-foreground ml-4">
-                        {format(chat.lastMessageAt.toDate(), 'dd.MM.yy HH:mm')}
-                      </div>
-                    )}
-                  </div>
-                </button>
-              ))}
+                  </button>
+                );
+              })}
             </div>
           )}
         </CardContent>
