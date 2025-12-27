@@ -16,7 +16,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
 
   return (
     <Link href={`/listings/${listing.id}`}>
-      <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
+      <Card className="hover:shadow-md transition-shadow cursor-pointer h-full border border-gray-200 shadow-sm rounded-lg">
         <div className="relative h-48 w-full overflow-hidden rounded-t-lg bg-muted">
           {listing.imageUrls?.[0] ? (
             <Image
