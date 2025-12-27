@@ -36,7 +36,7 @@ export function useUnreadChatsCount(userId: string | null | undefined) {
       // Future: Compare lastMessageAt with user's lastViewedAt per chat
       const count = snapshot.docs.filter(doc => {
         const data = doc.data() as Chat;
-        return data.lastMessageAt != null;
+        return data.lastMessageAt !== null && data.lastMessageAt !== undefined;
       }).length;
       
       setUnreadCount(count);
