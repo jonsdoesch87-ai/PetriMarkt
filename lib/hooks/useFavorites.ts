@@ -60,8 +60,8 @@ export function useFavorites(userId: string | null | undefined) {
           createdAt: Timestamp.now()
         });
       } else {
-        // Remove from favorites
-        snapshot.docs.forEach(doc => deleteDoc(doc.ref));
+        // Remove from favorites - handle multiple deletions concurrently
+        await Promise.all(snapshot.docs.map(doc => deleteDoc(doc.ref)));
       }
     } catch (error) {
       console.error('Error toggling favorite:', error);

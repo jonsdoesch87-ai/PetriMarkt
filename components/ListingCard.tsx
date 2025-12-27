@@ -33,7 +33,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
           <button
             onClick={handleFavoriteClick}
             className="absolute top-3 right-3 z-10 p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors"
-            aria-label="Zu Favoriten hinzufügen"
+            aria-label={isFavorite(listing.id) ? "Von Favoriten entfernen" : "Zu Favoriten hinzufügen"}
           >
             <Heart
               className={`h-5 w-5 ${

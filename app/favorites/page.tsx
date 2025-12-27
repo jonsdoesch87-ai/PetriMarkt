@@ -31,18 +31,27 @@ export default function FavoritesPage() {
         const batchSize = 10;
         const allListings: Listing[] = [];
         
+        // Process batches concurrently for better performance
+        const batches: string[][] = [];
         for (let i = 0; i < favoriteIds.length; i += batchSize) {
-          const batch = favoriteIds.slice(i, i + batchSize);
-          const q = query(listingsRef, where('__name__', 'in', batch));
-          const snapshot = await getDocs(q);
-          
-          const batchListings = snapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          })) as Listing[];
-          
-          allListings.push(...batchListings);
+          batches.push(favoriteIds.slice(i, i + batchSize));
         }
+        
+        const batchResults = await Promise.all(
+          batches.map(async (batch) => {
+            const q = query(listingsRef, where('__name__', 'in', batch));
+            const snapshot = await getDocs(q);
+            return snapshot.docs.map(doc => ({
+              id: doc.id,
+              ...doc.data()
+            })) as Listing[];
+          })
+        );
+        
+        // Flatten results
+        batchResults.forEach(batchListings => {
+          allListings.push(...batchListings);
+        });
         
         setListings(allListings);
       } catch (error) {
