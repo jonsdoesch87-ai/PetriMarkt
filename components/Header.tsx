@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Fish, PlusCircle, MessageSquare, LogOut, User } from 'lucide-react';
+import { Fish, PlusCircle, MessageSquare, LogOut, User, Heart } from 'lucide-react';
 import AuthDialog from './AuthDialog';
 import { useState } from 'react';
 import { useUnreadChatsCount } from '@/lib/hooks';
@@ -17,7 +17,7 @@ export default function Header() {
   const unreadCount = useUnreadChatsCount(user?.uid);
 
   return (
-    <header className="border-b bg-primary sticky top-0 z-40 shadow-sm">
+    <header className="border-b bg-primary/90 backdrop-blur-md sticky top-0 z-40 shadow-sm">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 text-2xl font-bold text-primary-foreground">
@@ -32,6 +32,11 @@ export default function Header() {
                   <Button variant="secondary" className="gap-2">
                     <PlusCircle className="h-4 w-4" />
                     <span className="hidden sm:inline">Inserat erstellen</span>
+                  </Button>
+                </Link>
+                <Link href="/favorites">
+                  <Button variant="ghost" size="icon" className="text-primary-foreground hover:bg-primary-foreground/10">
+                    <Heart className="h-5 w-5" />
                   </Button>
                 </Link>
                 <Link href="/chat" className="relative">
