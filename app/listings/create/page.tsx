@@ -91,27 +91,37 @@ export default function CreateListingPage() {
 
     try {
       // Upload images first
-      const imageUrls = await uploadImages();
+      let imageUrls: string[] = [];
+      try {
+        imageUrls = await uploadImages();
+      } catch (uploadErr) {
+        console.error('Error uploading images:', uploadErr);
+        throw new Error('Fehler beim Hochladen der Bilder. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.');
+      }
 
-      // Create listing document
-      const listingData = {
-        sellerId: user.uid,
-        title,
-        description,
-        price: parseFloat(price),
-        condition,
-        category,
-        canton,
-        imageUrls,
-        createdAt: serverTimestamp(),
-      };
+      // Create listing document only after successful upload
+      try {
+        const listingData = {
+          sellerId: user.uid,
+          title,
+          description,
+          price: parseFloat(price),
+          condition,
+          category,
+          canton,
+          imageUrls,
+          createdAt: serverTimestamp(),
+        };
 
-      const docRef = await addDoc(collection(db, 'listings'), listingData);
-      
-      router.push(`/listings/${docRef.id}`);
+        const docRef = await addDoc(collection(db, 'listings'), listingData);
+        router.push(`/listings/${docRef.id}`);
+      } catch (dbErr) {
+        console.error('Error creating listing in database:', dbErr);
+        throw new Error('Fehler beim Speichern des Inserats in der Datenbank. Bitte versuchen Sie es erneut.');
+      }
     } catch (err) {
       console.error('Error creating listing:', err);
-      setError('Fehler beim Erstellen des Inserats: ' + (err instanceof Error ? err.message : String(err)));
+      setError(err instanceof Error ? err.message : 'Ein unbekannter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.');
       setLoading(false);
     }
   };
