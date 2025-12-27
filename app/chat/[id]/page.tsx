@@ -137,14 +137,12 @@ export default function ChatPage() {
 
       await addDoc(collection(db, 'messages'), messageData);
       
-      // Update chat with last message
+      // Update chat with last message and mark as read for sender in a single operation
       await updateDoc(doc(db, 'chats', params.id as string), {
         lastMessage: newMessage.trim(),
         lastMessageAt: serverTimestamp(),
+        [`lastRead.${user.uid}`]: serverTimestamp(),
       });
-
-      // Mark chat as read for sender
-      await markChatAsRead();
 
       setNewMessage('');
     } catch (error) {
