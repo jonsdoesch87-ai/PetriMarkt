@@ -80,14 +80,15 @@ export default function BlogPage() {
         })) as Article[];
         
         // Client-seitig filtern und sortieren
-        allArticles = allArticles.filter(a => a.status === 'published');
-        allArticles.sort((a, b) => {
-          const dateA = a.publishedAt?.toMillis() || a.createdAt?.toMillis() || 0;
-          const dateB = b.publishedAt?.toMillis() || b.createdAt?.toMillis() || 0;
-          return dateB - dateA;
-        });
+        const publishedArticles = allArticles
+          .filter(a => a.status === 'published')
+          .sort((a, b) => {
+            const dateA = a.publishedAt?.toMillis() || a.createdAt?.toMillis() || 0;
+            const dateB = b.publishedAt?.toMillis() || b.createdAt?.toMillis() || 0;
+            return dateB - dateA;
+          });
         
-        setArticles(allArticles);
+        setArticles(publishedArticles);
       } catch (fallbackError) {
         console.error('Error in fallback fetch:', fallbackError);
       }
