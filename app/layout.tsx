@@ -10,6 +10,15 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   themeColor: "#93c5fd",
   viewport: "width=device-width, initial-scale=1, maximum-scale=1",
+  icons: {
+    icon: [
+      { url: "/icon.png", type: "image/png" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: [
+      { url: "/icon.png", type: "image/png" },
+    ],
+  },
 };
 
 export default function RootLayout({

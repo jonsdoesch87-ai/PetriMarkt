@@ -110,13 +110,13 @@ export default function ListingCard({ listing }: ListingCardProps) {
         isSold && "opacity-60",
         isFeatured && "border-2 border-amber-400 shadow-amber-200/50 shadow-lg"
       )}>
-        <div className="relative h-48 w-full overflow-hidden rounded-t-2xl bg-muted">
+        <div className="relative h-48 w-full overflow-hidden rounded-t-2xl bg-muted flex items-center justify-center">
           {listing.imageUrls?.[0] ? (
             <Image
               src={imageUrl}
               alt={listing.title}
               fill
-              className="object-cover"
+              className="object-contain"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           ) : (
