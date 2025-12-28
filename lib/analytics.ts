@@ -21,6 +21,7 @@ export const isAnalyticsEnabled = (): boolean => {
  */
 export const trackEvent = async (
   eventName: EventNameString | string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   eventParams?: { [key: string]: any }
 ): Promise<void> => {
   if (!analytics || !isAnalyticsEnabled()) {
@@ -28,7 +29,8 @@ export const trackEvent = async (
   }
 
   try {
-    await logEvent(analytics, eventName as EventNameString, eventParams);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await logEvent(analytics, eventName as any, eventParams);
   } catch (error) {
     console.error('Error tracking event:', error);
   }

@@ -15,7 +15,7 @@ export default function AGBPage() {
             <div className="space-y-4 text-muted-foreground">
               <p>
                 Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für die Nutzung der Online-Plattform PetriMarkt 
-                (nachfolgend "Plattform" genannt) durch Nutzer (nachfolgend "Nutzer" oder "Sie" genannt).
+                (nachfolgend &quot;Plattform&quot; genannt) durch Nutzer (nachfolgend &quot;Nutzer&quot; oder &quot;Sie&quot; genannt).
               </p>
               <p>
                 Die Plattform wird betrieben von Jonas Oesch, Bärenfelserstrasse 25, 4057 Basel, Schweiz.

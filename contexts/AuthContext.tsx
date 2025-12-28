@@ -8,7 +8,7 @@ import {
   createUserWithEmailAndPassword,
   signOut as firebaseSignOut,
 } from 'firebase/auth';
-import { doc, getDoc, setDoc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, addDoc, collection, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import { User } from '@/lib/types';
 import { Canton } from '@/lib/constants';
@@ -30,6 +30,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!auth) {
+      setLoading(false);
+      return;
+    }
+    
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
       
@@ -44,7 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             uid: firebaseUser.uid,
             email: firebaseUser.email!,
             defaultCanton: 'ZH', // Default canton
-            createdAt: serverTimestamp() as any,
+            createdAt: serverTimestamp() as unknown as Timestamp,
           };
           await setDoc(doc(db, 'users', firebaseUser.uid), baseUser, { merge: true });
           setUserProfile(baseUser);
@@ -60,18 +65,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signIn = async (email: string, password: string) => {
+    if (!auth) throw new Error('Auth nicht verfügbar');
     await signInWithEmailAndPassword(auth, email, password);
   };
 
   const signUp = async (email: string, password: string, defaultCanton: Canton) => {
+    if (!auth || !db) throw new Error('Auth oder DB nicht verfügbar');
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const newUser: User = {
       uid: userCredential.user.uid,
       email: userCredential.user.email!,
       defaultCanton,
       agbAccepted: true,
-      agbAcceptedAt: serverTimestamp() as any,
-      createdAt: serverTimestamp() as any,
+      agbAcceptedAt: serverTimestamp() as unknown as Timestamp,
+      createdAt: serverTimestamp() as unknown as Timestamp,
     };
     
     // Create user profile
@@ -96,6 +103,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
+    if (!auth) throw new Error('Auth nicht verfügbar');
     await firebaseSignOut(auth);
     setUserProfile(null);
   };

@@ -13,7 +13,6 @@ import { Heart } from 'lucide-react';
 export default function FavoritesPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
-  const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -35,8 +34,6 @@ export default function FavoritesPage() {
           id: doc.id,
           ...doc.data()
         })) as Favorite[];
-
-        setFavorites(favoritesData);
 
         // Fetch listing details for each favorite
         const listingsData = await Promise.all(
