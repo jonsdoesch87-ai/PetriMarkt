@@ -32,8 +32,7 @@ export default function CreateListingPage() {
   const [price, setPrice] = useState('');
   const [condition, setCondition] = useState<Condition>('Gebraucht');
   const [category, setCategory] = useState<Category>('Sonstiges');
-  const [canton, setCanton] = useState<Canton>('ZH');
-  const [location, setLocation] = useState<string>('');
+  const [location, setLocation] = useState<string>('ZH'); // Default auf ZH, wird durch userProfile überschrieben
   const [showPhone, setShowPhone] = useState(false);
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
@@ -47,9 +46,9 @@ export default function CreateListingPage() {
   }, [user, authLoading, router]);
 
   useEffect(() => {
+    // Setze Standard-Kanton aus User-Profil
     if (userProfile?.defaultCanton) {
-      setCanton(userProfile.defaultCanton);
-      setLocation(userProfile.defaultCanton); // Setze location auch auf defaultCanton
+      setLocation(userProfile.defaultCanton);
     }
   }, [userProfile]);
 
@@ -145,8 +144,8 @@ export default function CreateListingPage() {
           price: parseFloat(price),
           condition,
           category,
-          canton,
-          location: location || canton, // Fallback auf canton falls location leer
+          canton: location as Canton, // Verwende location als canton für Rückwärtskompatibilität
+          location, // Speichere location separat (neues Feld)
           imageUrls,
           showPhone,
           status: 'active' as const,
@@ -259,10 +258,10 @@ export default function CreateListingPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="canton">Kanton *</Label>
-                <Select value={canton} onValueChange={(value) => setCanton(value as Canton)}>
-                  <SelectTrigger id="canton">
-                    <SelectValue />
+                <Label htmlFor="location">Standort/Kanton *</Label>
+                <Select value={location} onValueChange={(value) => setLocation(value)}>
+                  <SelectTrigger id="location">
+                    <SelectValue placeholder="Standort wählen" />
                   </SelectTrigger>
                   <SelectContent>
                     {CANTONS.map((c) => (
@@ -272,26 +271,10 @@ export default function CreateListingPage() {
                     ))}
                   </SelectContent>
                 </Select>
+                <p className="text-xs text-muted-foreground">
+                  Wählen Sie den Standort/Kanton für Ihr Inserat
+                </p>
               </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="location">Standort/Kanton *</Label>
-              <Select value={location || canton} onValueChange={(value) => setLocation(value)}>
-                <SelectTrigger id="location">
-                  <SelectValue placeholder="Standort wählen" />
-                </SelectTrigger>
-                <SelectContent>
-                  {CANTONS.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c} - {CANTON_NAMES[c]}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-muted-foreground">
-                Wählen Sie den Standort/Kanton für Ihr Inserat
-              </p>
             </div>
 
             <div className="space-y-2">
