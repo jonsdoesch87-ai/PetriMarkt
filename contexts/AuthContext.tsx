@@ -8,7 +8,7 @@ import {
   createUserWithEmailAndPassword,
   signOut as firebaseSignOut,
 } from 'firebase/auth';
-import { doc, getDoc, setDoc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, addDoc, collection, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import { User } from '@/lib/types';
 import { Canton } from '@/lib/constants';
@@ -30,10 +30,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!auth) {
+      setLoading(false);
+      return;
+    }
+    
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
       
-      if (firebaseUser) {
+      if (firebaseUser && db) {
         // Fetch user profile from Firestore
         const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
         if (userDoc.exists()) {
@@ -44,9 +49,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             uid: firebaseUser.uid,
             email: firebaseUser.email!,
             defaultCanton: 'ZH', // Default canton
-            createdAt: serverTimestamp() as any,
+            createdAt: serverTimestamp() as unknown as Timestamp,
           };
-          await setDoc(doc(db, 'users', firebaseUser.uid), baseUser, { merge: true });
+          if (db) {
+            await setDoc(doc(db, 'users', firebaseUser.uid), baseUser, { merge: true });
+          }
           setUserProfile(baseUser);
         }
       } else {
@@ -60,21 +67,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signIn = async (email: string, password: string) => {
+    if (!auth) {
+      throw new Error('Firebase Auth is not initialized');
+    }
     await signInWithEmailAndPassword(auth, email, password);
   };
 
   const signUp = async (email: string, password: string, defaultCanton: Canton) => {
+    if (!auth) {
+      throw new Error('Firebase Auth is not initialized');
+    }
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const newUser: User = {
       uid: userCredential.user.uid,
       email: userCredential.user.email!,
       defaultCanton,
       agbAccepted: true,
-      agbAcceptedAt: serverTimestamp() as any,
-      createdAt: serverTimestamp() as any,
+      agbAcceptedAt: serverTimestamp() as unknown as Timestamp,
+      createdAt: serverTimestamp() as unknown as Timestamp,
     };
     
     // Create user profile
+    if (!db) {
+      throw new Error('Firebase Firestore is not initialized');
+    }
+    
     await setDoc(doc(db, 'users', userCredential.user.uid), newUser);
     setUserProfile(newUser);
 
@@ -96,6 +113,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
+    if (!auth) {
+      return;
+    }
     await firebaseSignOut(auth);
     setUserProfile(null);
   };

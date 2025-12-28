@@ -30,6 +30,8 @@ export default function ListingDetailPage() {
   const isAdmin = userProfile?.role === 'admin';
 
   const fetchListing = useCallback(async () => {
+    if (!db) return;
+    
     try {
       const docRef = doc(db, 'listings', params.id as string);
       const docSnap = await getDoc(docRef);
@@ -86,6 +88,8 @@ export default function ListingDetailPage() {
 
     // Increment view count
     const incrementViewCount = async () => {
+      if (!db) return;
+      
       try {
         await updateDoc(doc(db, 'listings', listingId), {
           viewCount: increment(1),
@@ -154,7 +158,7 @@ export default function ListingDetailPage() {
   };
 
   const handleDeleteListing = async () => {
-    if (!isAdmin || !listing) return;
+    if (!isAdmin || !listing || !db) return;
     
     if (!confirm('Sind Sie sicher, dass Sie dieses Inserat löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.')) {
       return;
@@ -174,7 +178,7 @@ export default function ListingDetailPage() {
   };
 
   const handleBoostListing = async () => {
-    if (!isAdmin || !listing) return;
+    if (!isAdmin || !listing || !db) return;
 
     try {
       const currentBoost = listing.boostScore || 0;
@@ -190,7 +194,7 @@ export default function ListingDetailPage() {
   };
 
   const handleFeatureListing = async () => {
-    if (!isAdmin || !listing) return;
+    if (!isAdmin || !listing || !db) return;
 
     try {
       const isCurrentlyFeatured = listing.isFeatured === true;
@@ -207,7 +211,7 @@ export default function ListingDetailPage() {
   };
 
   const handleReportListing = async () => {
-    if (!user || !listing || !reportReason.trim()) return;
+    if (!user || !listing || !reportReason.trim() || !db) return;
 
     setReporting(true);
     try {

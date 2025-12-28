@@ -144,9 +144,12 @@ export default function EditListingPage() {
 
   const uploadNewImages = async (): Promise<string[]> => {
     if (imagesToAdd.length === 0) return [];
+    if (!user || !storage) {
+      throw new Error('User oder Storage nicht verfügbar');
+    }
     
     const uploadPromises = imagesToAdd.map(async (image, index) => {
-      const storageRef = ref(storage, `listings/${user!.uid}/${Date.now()}_${index}`);
+      const storageRef = ref(storage!, `listings/${user.uid}/${Date.now()}_${index}`);
       await uploadBytes(storageRef, image);
       return getDownloadURL(storageRef);
     });
@@ -156,11 +159,12 @@ export default function EditListingPage() {
 
   const deleteOldImages = async () => {
     if (imagesToDelete.length === 0) return;
+    if (!storage) return;
     
     const deletePromises = imagesToDelete.map(async (imageUrl) => {
       try {
         // Extract path from URL
-        const imageRef = ref(storage, imageUrl);
+        const imageRef = ref(storage!, imageUrl);
         await deleteObject(imageRef);
       } catch (error) {
         console.error('Error deleting image:', error);
@@ -173,7 +177,7 @@ export default function EditListingPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !listing) return;
+    if (!user || !listing || !db || !storage) return;
 
     setError('');
     

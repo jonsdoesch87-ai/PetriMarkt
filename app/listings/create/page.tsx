@@ -92,8 +92,12 @@ export default function CreateListingPage() {
   };
 
   const uploadImages = async (): Promise<string[]> => {
+    if (!user || !storage) {
+      throw new Error('User oder Storage nicht verfügbar');
+    }
+    
     const uploadPromises = images.map(async (image, index) => {
-      const storageRef = ref(storage, `listings/${user!.uid}/${Date.now()}_${index}`);
+      const storageRef = ref(storage!, `listings/${user.uid}/${Date.now()}_${index}`);
       await uploadBytes(storageRef, image);
       return getDownloadURL(storageRef);
     });
@@ -103,7 +107,7 @@ export default function CreateListingPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user || !db || !storage) return;
 
     setError('');
     

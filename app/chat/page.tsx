@@ -43,7 +43,7 @@ export default function ChatListPage() {
       return;
     }
     
-    if (!user) return;
+    if (!user || !db) return;
 
     // Subscribe to chats in real-time
     const chatsRef = collection(db, 'chats');
@@ -60,7 +60,7 @@ export default function ChatListPage() {
             
             // Fetch listing details
             let listing: Listing | undefined;
-            if (chatData.listingId) {
+            if (chatData.listingId && db) {
               const listingDoc = await getDoc(doc(db, 'listings', chatData.listingId));
               if (listingDoc.exists()) {
                 listing = { id: listingDoc.id, ...listingDoc.data() } as Listing;
@@ -70,7 +70,7 @@ export default function ChatListPage() {
             // Get other user's email
             const otherUserId = chatData.participants.find(id => id !== user.uid);
             let otherUserEmail = 'Unbekannt';
-            if (otherUserId) {
+            if (otherUserId && db) {
               const userDoc = await getDoc(doc(db, 'users', otherUserId));
               if (userDoc.exists()) {
                 otherUserEmail = userDoc.data().email;

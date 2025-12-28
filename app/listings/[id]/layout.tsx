@@ -5,6 +5,13 @@ import { db } from '@/lib/firebase';
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
   
+  if (!db) {
+    return {
+      title: 'Inserat | PetriMarkt',
+      description: 'Fischereiartikel auf PetriMarkt',
+    };
+  }
+  
   try {
     const listingDoc = await getDoc(doc(db, 'listings', id));
     

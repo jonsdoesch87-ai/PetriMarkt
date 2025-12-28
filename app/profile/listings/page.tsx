@@ -46,7 +46,7 @@ export default function MyListingsPage() {
       return;
     }
 
-    if (!user) return;
+    if (!user || !db) return;
 
     // Subscribe to user's listings in real-time
     const listingsRef = collection(db, 'listings');
@@ -78,6 +78,8 @@ export default function MyListingsPage() {
   }, [user, authLoading, router]);
 
   const updateListingStatus = async (listingId: string, status: ListingStatus) => {
+    if (!db) return;
+    
     setUpdating(listingId);
     try {
       await updateDoc(doc(db, 'listings', listingId), {

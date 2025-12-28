@@ -23,12 +23,12 @@ export const trackEvent = async (
   eventName: EventNameString | string,
   eventParams?: { [key: string]: unknown }
 ): Promise<void> => {
-  if (!analytics || !isAnalyticsEnabled()) {
+  if (!analytics) {
     return;
   }
 
   try {
-    await logEvent(analytics, eventName as EventNameString, eventParams);
+    await logEvent(analytics, eventName, eventParams);
   } catch (error) {
     console.error('Error tracking event:', error);
   }

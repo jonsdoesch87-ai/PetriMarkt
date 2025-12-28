@@ -37,7 +37,7 @@ export default function ChatPage() {
 
   // Helper function to mark chat as read
   const markChatAsRead = useCallback(async () => {
-    if (!user) return;
+    if (!user || !db) return;
     
     try {
       await updateDoc(doc(db, 'chats', params.id as string), {
@@ -49,7 +49,7 @@ export default function ChatPage() {
   }, [user, params.id]);
 
   const fetchChatAndListing = useCallback(async () => {
-    if (!user) return;
+    if (!user || !db) return;
     
     try {
       const chatDoc = await getDoc(doc(db, 'chats', params.id as string));
@@ -72,7 +72,7 @@ export default function ChatPage() {
       await markChatAsRead();
 
       // Fetch listing
-      if (chatData.listingId) {
+      if (chatData.listingId && db) {
         const listingDoc = await getDoc(doc(db, 'listings', chatData.listingId));
         if (listingDoc.exists()) {
           setListing({ id: listingDoc.id, ...listingDoc.data() } as Listing);
@@ -97,7 +97,7 @@ export default function ChatPage() {
   }, [user, authLoading, router, fetchChatAndListing]);
 
   useEffect(() => {
-    if (!chat || !user) return;
+    if (!chat || !user || !db) return;
 
     // Subscribe to messages
     const messagesRef = collection(db, 'messages');
@@ -125,7 +125,7 @@ export default function ChatPage() {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !user || !chat) return;
+    if (!newMessage.trim() || !user || !chat || !db) return;
 
     try {
       const messageData = {
