@@ -90,8 +90,10 @@ export default function CreateBlogPage() {
       throw new Error('User oder Storage nicht verfügbar');
     }
 
+    const firebaseStorage = storage; // Create a const reference that TypeScript knows is not undefined
+
     const uploadPromises = images.map(async (image, index) => {
-      const storageRef = ref(storage, `blog/${user.uid}/${Date.now()}_${index}`);
+      const storageRef = ref(firebaseStorage, `blog/${user.uid}/${Date.now()}_${index}`);
       await uploadBytes(storageRef, image);
       return getDownloadURL(storageRef);
     });

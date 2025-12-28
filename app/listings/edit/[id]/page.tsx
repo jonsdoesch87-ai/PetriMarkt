@@ -145,8 +145,13 @@ export default function EditListingPage() {
   const uploadNewImages = async (): Promise<string[]> => {
     if (imagesToAdd.length === 0) return [];
     
+    if (!storage || !user) {
+      throw new Error('Storage oder User nicht verfügbar');
+    }
+    
+    const firebaseStorage = storage;
     const uploadPromises = imagesToAdd.map(async (image, index) => {
-      const storageRef = ref(storage, `listings/${user!.uid}/${Date.now()}_${index}`);
+      const storageRef = ref(firebaseStorage, `listings/${user.uid}/${Date.now()}_${index}`);
       await uploadBytes(storageRef, image);
       return getDownloadURL(storageRef);
     });
@@ -157,10 +162,16 @@ export default function EditListingPage() {
   const deleteOldImages = async () => {
     if (imagesToDelete.length === 0) return;
     
+    if (!storage) {
+      console.error('Storage nicht verfügbar');
+      return;
+    }
+    
+    const firebaseStorage = storage;
     const deletePromises = imagesToDelete.map(async (imageUrl) => {
       try {
         // Extract path from URL
-        const imageRef = ref(storage, imageUrl);
+        const imageRef = ref(firebaseStorage, imageUrl);
         await deleteObject(imageRef);
       } catch (error) {
         console.error('Error deleting image:', error);

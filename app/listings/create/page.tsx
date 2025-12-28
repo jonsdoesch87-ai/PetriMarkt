@@ -92,8 +92,13 @@ export default function CreateListingPage() {
   };
 
   const uploadImages = async (): Promise<string[]> => {
+    if (!storage || !user) {
+      throw new Error('Storage oder User nicht verfügbar');
+    }
+    
+    const firebaseStorage = storage;
     const uploadPromises = images.map(async (image, index) => {
-      const storageRef = ref(storage, `listings/${user!.uid}/${Date.now()}_${index}`);
+      const storageRef = ref(firebaseStorage, `listings/${user.uid}/${Date.now()}_${index}`);
       await uploadBytes(storageRef, image);
       return getDownloadURL(storageRef);
     });

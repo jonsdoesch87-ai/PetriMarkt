@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { collection, query, orderBy, getDocs, updateDoc, doc, serverTimestamp, getDoc } from 'firebase/firestore';
+import { collection, query, orderBy, getDocs, updateDoc, doc, serverTimestamp, getDoc, Timestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Article, User } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -97,7 +97,7 @@ export default function AdminBlogPage() {
       // Artikel-Liste aktualisieren
       setArticles(articles.map(article => 
         article.id === articleId 
-          ? { ...article, status: 'published', publishedAt: serverTimestamp() as unknown }
+          ? { ...article, status: 'published' as const, publishedAt: serverTimestamp() as unknown as Timestamp }
           : article
       ));
     } catch (error) {
