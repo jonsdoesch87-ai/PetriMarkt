@@ -8,7 +8,7 @@ import {
   createUserWithEmailAndPassword,
   signOut as firebaseSignOut,
 } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import { User } from '@/lib/types';
 import { Canton } from '@/lib/constants';
@@ -38,6 +38,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
         if (userDoc.exists()) {
           setUserProfile(userDoc.data() as User);
+        } else {
+          // Create base user document if it doesn't exist (e.g., for existing users)
+          const baseUser: User = {
+            uid: firebaseUser.uid,
+            email: firebaseUser.email!,
+            defaultCanton: 'ZH', // Default canton
+            createdAt: serverTimestamp() as any,
+          };
+          await setDoc(doc(db, 'users', firebaseUser.uid), baseUser, { merge: true });
+          setUserProfile(baseUser);
         }
       } else {
         setUserProfile(null);
@@ -59,11 +69,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       uid: userCredential.user.uid,
       email: userCredential.user.email!,
       defaultCanton,
-      createdAt: new Date() as any,
+      agbAccepted: true,
+      agbAcceptedAt: serverTimestamp() as any,
+      createdAt: serverTimestamp() as any,
     };
     
+    // Create user profile
     await setDoc(doc(db, 'users', userCredential.user.uid), newUser);
     setUserProfile(newUser);
+
+    // Create welcome email document for Firebase Trigger Email Extension
+    // This should not block the registration process if it fails
+    try {
+      await addDoc(collection(db, 'mail'), {
+        to: email,
+        message: {
+          subject: 'Willkommen bei PetriMarkt – Dein Marktplatz für Angelbedarf!',
+          html: '<h1>Petri Heil!</h1><p>Vielen Dank für deine Registrierung bei PetriMarkt. Wir freuen uns, dich in unserer Community zu haben.</p><p>Du kannst ab sofort Inserate erstellen und mit anderen Fischern Kontakt aufnehmen.</p><p>Beste Grüsse,<br>Jonas von PetriMarkt</p>',
+        },
+      });
+    } catch (emailError) {
+      // Log error but don't block registration
+      console.error('Error creating welcome email document:', emailError);
+      // Registration continues successfully even if email creation fails
+    }
   };
 
   const signOut = async () => {

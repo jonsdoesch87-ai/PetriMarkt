@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   Dialog,
@@ -12,6 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Select,
   SelectContent,
@@ -30,6 +32,7 @@ export default function AuthDialog({ onClose }: AuthDialogProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [canton, setCanton] = useState<Canton>('ZH');
+  const [agbAccepted, setAgbAccepted] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
@@ -38,6 +41,13 @@ export default function AuthDialog({ onClose }: AuthDialogProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // Validierung: Bei Registrierung muss AGB-Checkbox aktiviert sein
+    if (isSignUp && !agbAccepted) {
+      setError('Bitte akzeptieren Sie die AGB und Datenschutzerklärung, um sich zu registrieren.');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -80,7 +90,21 @@ export default function AuthDialog({ onClose }: AuthDialogProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Passwort</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password">Passwort</Label>
+              {!isSignUp && (
+                <Link
+                  href="/forgot-password"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onClose();
+                  }}
+                  className="text-sm text-primary hover:underline"
+                >
+                  Passwort vergessen?
+                </Link>
+              )}
+            </div>
             <Input
               id="password"
               type="password"
@@ -110,12 +134,53 @@ export default function AuthDialog({ onClose }: AuthDialogProps) {
             </div>
           )}
 
+          {isSignUp && (
+            <div className="flex items-start space-x-2">
+              <Checkbox
+                id="agb"
+                checked={agbAccepted}
+                onCheckedChange={(checked) => setAgbAccepted(checked === true)}
+                className="mt-1"
+              />
+              <Label
+                htmlFor="agb"
+                className="text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Ich akzeptiere die{' '}
+                <Link
+                  href="/agb"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  AGB
+                </Link>
+                {' '}und habe die{' '}
+                <Link
+                  href="/datenschutz"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  Datenschutzerklärung
+                </Link>
+                {' '}gelesen.
+              </Label>
+            </div>
+          )}
+
           {error && (
             <div className="text-sm text-destructive">{error}</div>
           )}
 
           <div className="flex flex-col gap-2">
-            <Button type="submit" disabled={loading} className="w-full">
+            <Button 
+              type="submit" 
+              disabled={loading || (isSignUp && !agbAccepted)} 
+              className="w-full"
+            >
               {loading ? 'Bitte warten...' : isSignUp ? 'Registrieren' : 'Anmelden'}
             </Button>
             <Button
@@ -124,6 +189,7 @@ export default function AuthDialog({ onClose }: AuthDialogProps) {
               onClick={() => {
                 setIsSignUp(!isSignUp);
                 setError('');
+                setAgbAccepted(false);
               }}
               className="w-full"
             >

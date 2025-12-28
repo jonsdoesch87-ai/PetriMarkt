@@ -4,15 +4,16 @@
 
 @layer base {
   :root {
-    /* Marine blue theme - primary (#1e3a8a) */
-    --primary: 221 83% 33%; /* Deep marine blue */
+    /* Outdoor theme - primary (#93c5fd) - luftiges Blau */
+    --primary: 213 92% 78%; /* Light airy blue */
     --primary-foreground: 0 0% 100%;
     
-    /* Warm brown accent theme - secondary (#78350f) */
-    --secondary: 30 88% 26%; /* Rich brown */
+    /* Outdoor theme - secondary (#A3B18A) - pastelliges Olive-Grün */
+    --secondary: 85 25% 65%; /* Pastel olive green */
     --secondary-foreground: 0 0% 100%;
     
-    --background: 0 0% 100%;
+    /* Outdoor theme - background (#f5f5f0) - sehr helles Sandweiß/Beige */
+    --background: 60 20% 95%;
     --foreground: 210 15% 15%;
     
     --card: 0 0% 100%;
@@ -24,23 +25,23 @@
     --muted: 210 40% 96%;
     --muted-foreground: 210 10% 45%;
     
-    --accent: 30 88% 95%; /* Light brown accent */
-    --accent-foreground: 30 88% 26%;
+    --accent: 85 25% 90%; /* Light olive accent */
+    --accent-foreground: 85 25% 65%;
     
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
     
     --border: 220 13% 91%; /* Light gray border */
     --input: 220 13% 91%;
-    --ring: 221 83% 33%;
+    --ring: 213 92% 78%;
     
     --radius: 0.5rem;
     
-    --chart-1: 221 83% 33%;
-    --chart-2: 30 88% 26%;
-    --chart-3: 221 70% 50%;
-    --chart-4: 30 70% 45%;
-    --chart-5: 221 60% 65%;
+    --chart-1: 213 92% 78%;
+    --chart-2: 85 25% 65%;
+    --chart-3: 213 70% 60%;
+    --chart-4: 82 50% 50%;
+    --chart-5: 213 60% 70%;
   }
 }
 

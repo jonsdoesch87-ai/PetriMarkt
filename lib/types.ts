@@ -5,8 +5,16 @@ export interface User {
   uid: string;
   email: string;
   defaultCanton: Canton;
+  displayName?: string;
+  phoneNumber?: string;
+  city?: string;
+  role?: 'admin' | 'user';
+  agbAccepted?: boolean;
+  agbAcceptedAt?: Timestamp;
   createdAt: Timestamp;
 }
+
+export type ListingStatus = 'active' | 'reserved' | 'sold' | 'deleted' | 'expired';
 
 export interface Listing {
   id: string;
@@ -18,6 +26,13 @@ export interface Listing {
   category: Category;
   canton: Canton;
   imageUrls: string[];
+  showPhone?: boolean;
+  status?: ListingStatus;
+  deletedBy?: 'admin' | 'user';
+  isFeatured?: boolean;
+  boostScore?: number;
+  featuredUntil?: Timestamp | null;
+  viewCount?: number;
   createdAt: Timestamp;
 }
 
@@ -36,4 +51,34 @@ export interface Message {
   senderId: string;
   text: string;
   createdAt: Timestamp;
+}
+
+export interface Favorite {
+  id: string;
+  userId: string;
+  listingId: string;
+  createdAt: Timestamp;
+}
+
+export interface Report {
+  id: string;
+  listingId: string;
+  reporterId: string;
+  reason: string;
+  createdAt: Timestamp;
+}
+
+export interface Article {
+  id: string;
+  slug: string;
+  title: string;
+  description?: string;
+  content: string; // HTML or Markdown content
+  imageUrls: string[]; // Array of image URLs (1 or more)
+  author: string;
+  authorId: string; // User ID of the author
+  publishedAt: Timestamp | null; // null = draft
+  createdAt: Timestamp;
+  updatedAt?: Timestamp;
+  status: 'draft' | 'published';
 }

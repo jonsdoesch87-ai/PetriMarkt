@@ -18,8 +18,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
 import { CATEGORIES, CANTONS, CANTON_NAMES, CONDITIONS, Category, Canton, Condition } from '@/lib/constants';
 import { Upload, X } from 'lucide-react';
+import imageCompression from 'browser-image-compression';
 
 export default function CreateListingPage() {
   const router = useRouter();
@@ -31,6 +33,7 @@ export default function CreateListingPage() {
   const [condition, setCondition] = useState<Condition>('Gebraucht');
   const [category, setCategory] = useState<Category>('Sonstiges');
   const [canton, setCanton] = useState<Canton>('ZH');
+  const [showPhone, setShowPhone] = useState(false);
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -48,23 +51,39 @@ export default function CreateListingPage() {
     }
   }, [userProfile]);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (images.length + files.length > 3) {
       setError('Maximal 3 Bilder erlaubt');
       return;
     }
 
-    setImages([...images, ...files]);
-    
-    // Create previews
-    files.forEach(file => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreviews(prev => [...prev, reader.result as string]);
-      };
-      reader.readAsDataURL(file);
-    });
+    // Compress and resize images
+    const compressionOptions = {
+      maxSizeMB: 1,
+      maxWidthOrHeight: 1200,
+      useWebWorker: true,
+    };
+
+    try {
+      const compressedFiles = await Promise.all(
+        files.map(file => imageCompression(file, compressionOptions))
+      );
+
+      setImages([...images, ...compressedFiles]);
+      
+      // Create previews
+      compressedFiles.forEach(file => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreviews(prev => [...prev, reader.result as string]);
+        };
+        reader.readAsDataURL(file);
+      });
+    } catch (error) {
+      console.error('Error compressing images:', error);
+      setError('Fehler beim Verarbeiten der Bilder');
+    }
   };
 
   const removeImage = (index: number) => {
@@ -87,6 +106,18 @@ export default function CreateListingPage() {
     if (!user) return;
 
     setError('');
+    
+    // Validation
+    if (!price || parseFloat(price) <= 0) {
+      setError('Bitte geben Sie einen gültigen Preis ein.');
+      return;
+    }
+
+    if (images.length === 0) {
+      setError('Bitte laden Sie mindestens ein Bild hoch.');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -110,6 +141,12 @@ export default function CreateListingPage() {
           category,
           canton,
           imageUrls,
+          showPhone,
+          status: 'active' as const,
+          isFeatured: false,
+          boostScore: 0,
+          featuredUntil: null,
+          viewCount: 0,
           createdAt: serverTimestamp(),
         };
 
@@ -232,11 +269,30 @@ export default function CreateListingPage() {
             </div>
 
             <div className="space-y-2">
+              <div className="flex items-center justify-between p-4 border rounded-lg bg-[#f5f5f0]">
+                <div className="space-y-0.5">
+                  <Label htmlFor="showPhone" className="text-base">
+                    Telefonnummer im Inserat anzeigen
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    Ihre Telefonnummer wird im Inserat angezeigt, wenn aktiviert
+                  </p>
+                </div>
+                <Switch
+                  id="showPhone"
+                  checked={showPhone}
+                  onCheckedChange={setShowPhone}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
               <Label>Bilder (max. 3)</Label>
               <div className="border-2 border-dashed rounded-lg p-6 text-center">
                 <input
                   type="file"
                   accept="image/*"
+                  capture="environment"
                   multiple
                   onChange={handleImageChange}
                   className="hidden"

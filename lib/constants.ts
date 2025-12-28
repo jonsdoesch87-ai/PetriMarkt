@@ -69,7 +69,7 @@ export const CATEGORIES = [
 ] as const;
 
 // Condition options
-export const CONDITIONS = ['Neu', 'Gebraucht', 'Defekt'] as const;
+export const CONDITIONS = ['Neu', 'Gebraucht', 'Selbst hergestellt', 'Defekt'] as const;
 
 export type Canton = typeof CANTONS[number];
 export type Category = typeof CATEGORIES[number];
