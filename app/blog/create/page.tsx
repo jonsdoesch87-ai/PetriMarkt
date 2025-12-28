@@ -91,7 +91,7 @@ export default function CreateBlogPage() {
     }
 
     const uploadPromises = images.map(async (image, index) => {
-      const storageRef = ref(storage, `blog/${user.uid}/${Date.now()}_${index}`);
+      const storageRef = ref(storage!, `blog/${user!.uid}/${Date.now()}_${index}`);
       await uploadBytes(storageRef, image);
       return getDownloadURL(storageRef);
     });
@@ -128,7 +128,7 @@ export default function CreateBlogPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !db) return;
+    if (!user || !db || !storage) return;
 
     setError('');
     
