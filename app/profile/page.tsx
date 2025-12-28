@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
-import { doc, setDoc, serverTimestamp, getDoc, deleteDoc, collection, query, where, getDocs, writeBatch } from 'firebase/firestore';
+import { doc, setDoc, serverTimestamp, getDoc, collection, query, where, getDocs, writeBatch } from 'firebase/firestore';
 import { deleteUser } from 'firebase/auth';
 import { db, auth } from '@/lib/firebase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -50,6 +50,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     loadProfileData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userProfile]);
 
   // Reset to view mode and reload data when canceling
