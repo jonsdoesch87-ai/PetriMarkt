@@ -183,13 +183,7 @@ export default function HomePage() {
           <div className="flex flex-col md:flex-row gap-3 md:gap-4">
             <Select value={selectedCategory} onValueChange={(value) => setSelectedCategory(value as Category | 'all')}>
               <SelectTrigger className="w-full md:w-[200px]">
-                <div className="flex items-center gap-2">
-                  {selectedCategory !== 'all' && (() => {
-                    const Icon = CATEGORY_ICONS[selectedCategory];
-                    return <Icon className="h-4 w-4" />;
-                  })()}
-                  <SelectValue placeholder="Kategorie" />
-                </div>
+                <SelectValue placeholder="Kategorie" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">
