@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { collection, query, orderBy, getDocs, where, doc, getDoc } from 'firebase/firestore';
+import { collection, query, getDocs, where, doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Article, User } from '@/lib/types';
 import { Card, CardContent } from '@/components/ui/card';
@@ -33,7 +33,7 @@ export default function BlogPage() {
         where('status', '==', 'published')
       );
       const snapshot = await getDocs(q);
-      let articlesData = snapshot.docs.map(doc => ({
+      const articlesData = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       })) as Article[];

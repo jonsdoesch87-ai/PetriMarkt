@@ -9,7 +9,7 @@ import { Article, User } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, User as UserIcon, Edit, Eye, CheckCircle2, FileText } from 'lucide-react';
+import { Calendar, User as UserIcon, Eye, CheckCircle2, FileText } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { format } from 'date-fns';
@@ -97,7 +97,7 @@ export default function AdminBlogPage() {
       // Artikel-Liste aktualisieren
       setArticles(articles.map(article => 
         article.id === articleId 
-          ? { ...article, status: 'published', publishedAt: serverTimestamp() as any }
+          ? { ...article, status: 'published', publishedAt: serverTimestamp() as unknown }
           : article
       ));
     } catch (error) {

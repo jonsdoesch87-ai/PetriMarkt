@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Upload, X } from 'lucide-react';
+import Image from 'next/image';
 import imageCompression from 'browser-image-compression';
 import { generateSlug } from '@/lib/utils';
 
@@ -113,7 +114,7 @@ export default function CreateBlogPage() {
   };
 
   const generateUniqueSlug = async (title: string): Promise<string> => {
-    let baseSlug = generateSlug(title);
+    const baseSlug = generateSlug(title);
     let slug = baseSlug;
     let counter = 1;
 
@@ -178,7 +179,7 @@ export default function CreateBlogPage() {
           createdAt: serverTimestamp(),
         };
 
-        const docRef = await addDoc(collection(db, 'articles'), articleData);
+        await addDoc(collection(db, 'articles'), articleData);
         router.push(`/blog/${slug}`);
       } catch (dbErr) {
         console.error('Error creating article in database:', dbErr);
@@ -291,9 +292,11 @@ export default function CreateBlogPage() {
                 <div className="grid grid-cols-3 gap-4 mt-4">
                   {imagePreviews.map((preview, index) => (
                     <div key={index} className="relative">
-                      <img
+                      <Image
                         src={preview}
                         alt={`Preview ${index + 1}`}
+                        width={300}
+                        height={128}
                         className="w-full h-32 object-cover rounded-lg"
                       />
                       <button

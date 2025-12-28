@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
-import { doc, setDoc, serverTimestamp, getDoc, deleteDoc, collection, query, where, getDocs, writeBatch } from 'firebase/firestore';
+import { doc, setDoc, serverTimestamp, getDoc, collection, query, where, getDocs, writeBatch } from 'firebase/firestore';
 import { deleteUser } from 'firebase/auth';
 import { db, auth } from '@/lib/firebase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -33,14 +33,14 @@ export default function ProfilePage() {
   const [success, setSuccess] = useState(false);
 
   // Load data from userProfile into local state
-  const loadProfileData = () => {
+  const loadProfileData = useCallback(() => {
     if (userProfile) {
       setCanton(userProfile.defaultCanton || 'ZH');
       setDisplayName(userProfile.displayName || '');
       setPhoneNumber(userProfile.phoneNumber || '');
       setCity(userProfile.city || '');
     }
-  };
+  }, [userProfile]);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -50,7 +50,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     loadProfileData();
-  }, [userProfile]);
+  }, [loadProfileData]);
 
   // Reset to view mode and reload data when canceling
   const handleCancel = () => {

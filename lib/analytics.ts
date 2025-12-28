@@ -21,7 +21,7 @@ export const isAnalyticsEnabled = (): boolean => {
  */
 export const trackEvent = async (
   eventName: EventNameString | string,
-  eventParams?: { [key: string]: any }
+  eventParams?: { [key: string]: unknown }
 ): Promise<void> => {
   if (!analytics || !isAnalyticsEnabled()) {
     return;
