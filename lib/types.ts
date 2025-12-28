@@ -25,6 +25,7 @@ export interface Listing {
   condition: Condition;
   category: Category;
   canton: Canton;
+  location?: string; // Standort/Kanton (z.B. "Basel, BS" oder "Zürich, ZH")
   imageUrls: string[];
   showPhone?: boolean;
   status?: ListingStatus;

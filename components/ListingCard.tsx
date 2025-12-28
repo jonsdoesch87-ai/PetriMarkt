@@ -168,7 +168,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
           </p>
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
             <MapPin className="h-4 w-4" />
-            <span>{listing.canton}</span>
+            <span>{listing.location || listing.canton}</span>
             <span className="mx-2">•</span>
             <span>{listing.category}</span>
           </div>

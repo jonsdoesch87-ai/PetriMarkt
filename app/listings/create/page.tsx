@@ -33,6 +33,7 @@ export default function CreateListingPage() {
   const [condition, setCondition] = useState<Condition>('Gebraucht');
   const [category, setCategory] = useState<Category>('Sonstiges');
   const [canton, setCanton] = useState<Canton>('ZH');
+  const [location, setLocation] = useState<string>('');
   const [showPhone, setShowPhone] = useState(false);
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
@@ -48,6 +49,7 @@ export default function CreateListingPage() {
   useEffect(() => {
     if (userProfile?.defaultCanton) {
       setCanton(userProfile.defaultCanton);
+      setLocation(userProfile.defaultCanton); // Setze location auch auf defaultCanton
     }
   }, [userProfile]);
 
@@ -144,6 +146,7 @@ export default function CreateListingPage() {
           condition,
           category,
           canton,
+          location: location || canton, // Fallback auf canton falls location leer
           imageUrls,
           showPhone,
           status: 'active' as const,
@@ -273,6 +276,25 @@ export default function CreateListingPage() {
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="location">Standort/Kanton *</Label>
+              <Select value={location || canton} onValueChange={(value) => setLocation(value)}>
+                <SelectTrigger id="location">
+                  <SelectValue placeholder="Standort wählen" />
+                </SelectTrigger>
+                <SelectContent>
+                  {CANTONS.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c} - {CANTON_NAMES[c]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Wählen Sie den Standort/Kanton für Ihr Inserat
+              </p>
+            </div>
+
+            <div className="space-y-2">
               <div className="flex items-center justify-between p-4 border rounded-lg bg-[#f5f5f0]">
                 <div className="space-y-0.5">
                   <Label htmlFor="showPhone" className="text-base">
@@ -296,7 +318,6 @@ export default function CreateListingPage() {
                 <input
                   type="file"
                   accept="image/*"
-                  capture="environment"
                   multiple
                   onChange={handleImageChange}
                   className="hidden"
